@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4:6 Method Coffee Logger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F3F4F6; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .toast-enter { animation: fade-in-up 0.3s ease-out forwards; }
+        @keyframes fade-in-up {
+            0% { opacity: 0; transform: translateY(20px) translateX(-50%); }
+            100% { opacity: 1; transform: translateY(0) translateX(-50%); }
+        }
+        .toggle-checkbox:checked { right: 0; border-color: #3B82F6; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #3B82F6; }
+        .tab-hidden { display: none !important; }
+    </style>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" href="./favicon.ico" sizes="any">
+</head>
+<body class="text-gray-800 antialiased min-h-screen pb-8">
+
+<!-- ヘッダーの高さを h-16 にし、適度なゆとりを確保 -->
+<header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 flex justify-between items-center h-16">
+        <div class="flex items-center gap-6 h-full">
+            <h1 class="text-lg font-bold flex items-center gap-1.5">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                BrewLog <span class="text-xs text-blue-300 font-normal mt-0.5">4:6</span>
+            </h1>
+            <nav class="flex space-x-4 h-full pt-1" aria-label="Tabs">
+                <button onclick="switchTab('record')" id="tab-btn-record" class="border-b-2 border-blue-400 text-blue-400 px-2 h-full flex items-center text-sm font-medium transition-colors">記録する</button>
+                <button onclick="switchTab('history')" id="tab-btn-history" class="border-b-2 border-transparent text-slate-400 hover:text-slate-300 px-2 h-full flex items-center text-sm font-medium transition-colors">履歴・検索</button>
+            </nav>
+        </div>
+        <div class="text-xs text-green-400 font-semibold flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> <span class="hidden sm:inline">Cloud Sync</span>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-5xl mx-auto px-4 py-6">
+    
+    <!-- タブ1：計算＆登録フォーム -->
+    <section id="tab-content-record" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- パネルの余白を p-5 に設定 -->
+        <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100 h-fit">
+            <h2 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                Recipe Calculator
+            </h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">種類</label>
+                    <div class="flex rounded-md shadow-sm" role="group">
+                        <button type="button" id="btn-drink-black" class="flex-1 px-4 py-2 text-sm font-medium rounded-l-lg border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors">ブラック</button>
+                        <button type="button" id="btn-drink-latte" class="flex-1 px-4 py-2 text-sm font-medium rounded-r-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors">カフェラテ</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">計算基準</label>
+                    <div class="flex rounded-md shadow-sm" role="group">
+                        <button type="button" id="btn-type-beans" class="flex-1 px-4 py-2 text-sm font-medium rounded-l-lg border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors">豆の量 (g)</button>
+                        <button type="button" id="btn-type-yield" class="flex-1 px-4 py-2 text-sm font-medium rounded-r-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors">総量 (ml)</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label id="input-label" class="block text-sm font-medium text-gray-700 mb-1">豆の量 (g)</label>
+                    <input type="number" id="base-amount" value="15" min="1" class="w-full rounded-md border-gray-300 shadow-sm px-4 py-2 border focus:ring-slate-500 focus:border-slate-500 transition-shadow">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">味の調整 (1, 2投目)</label>
+                    <div class="flex rounded-md shadow-sm" role="group">
+                        <button type="button" id="btn-flavor-sweet" class="flex-1 px-4 py-2 text-sm font-medium rounded-l-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors">甘味</button>
+                        <button type="button" id="btn-flavor-normal" class="flex-1 px-4 py-2 text-sm font-medium border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors">通常</button>
+                        <button type="button" id="btn-flavor-acidic" class="flex-1 px-4 py-2 text-sm font-medium rounded-r-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors">酸味</button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between py-1">
+                    <span class="text-sm font-medium text-gray-700">アイス (氷冷却)</span>
+                    <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                        <input type="checkbox" id="is-ice-toggle" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer transition-transform duration-200 ease-in-out z-10"/>
+                        <label for="is-ice-toggle" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer transition-colors duration-200 ease-in-out"></label>
+                    </div>
+                </div>
+
+                <div id="recipe-result" class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                    <div class="grid grid-cols-2 gap-4 mb-3">
+                        <div class="bg-white p-3 rounded-lg shadow-sm text-center">
+                            <span class="block text-xs text-gray-500 mb-1">必要な豆</span>
+                            <span id="res-beans" class="text-xl font-bold text-slate-800">0g</span>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg shadow-sm text-center">
+                            <span class="block text-xs text-gray-500 mb-1">ドリンク総量</span>
+                            <span id="res-water" class="text-xl font-bold text-slate-800">0ml</span>
+                        </div>
+                    </div>
+                    <div id="milk-section" class="mb-3 bg-orange-50 p-2.5 rounded-lg text-center hidden border border-orange-100">
+                        <span class="block text-xs text-orange-600 mb-0.5">追加するミルク</span>
+                        <span id="res-milk" class="text-lg font-bold text-orange-800">0ml</span>
+                    </div>
+                    <div id="ice-section" class="mb-3 bg-blue-50 p-2.5 rounded-lg text-center hidden border border-blue-100">
+                        <span class="block text-xs text-blue-600 mb-0.5">サーバーにセットする氷</span>
+                        <span id="res-ice" class="text-lg font-bold text-blue-800">0g</span>
+                    </div>
+                    <div class="space-y-1.5">
+                        <h4 class="text-sm font-bold text-gray-700 flex justify-between">
+                            <span>注湯スケジュール</span>
+                            <span id="res-hot-water" class="text-xs text-gray-500">お湯: 0ml</span>
+                        </h4>
+                        <ul id="pour-list" class="text-sm space-y-1"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100 h-fit">
+            <h2 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                Save to Log
+            </h2>
+            <form id="log-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">抽出日時 (未入力で現在時刻)</label>
+                    <input type="datetime-local" id="log-datetime" class="w-full rounded-md border-gray-300 shadow-sm px-4 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">豆の種類・銘柄</label>
+                    <input type="text" id="log-beans-name" list="beans-list" placeholder="例: 澤井珈琲 エチオピア" required class="w-full rounded-md border-gray-300 shadow-sm px-4 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm">
+                    <datalist id="beans-list"></datalist>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">挽目 (C3)</label>
+                        <input type="number" id="log-grind" placeholder="例: 13" required class="w-full rounded-md border-gray-300 shadow-sm px-4 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">湯温 (℃)</label>
+                        <input type="number" id="log-temp" value="92" class="w-full rounded-md border-gray-300 shadow-sm px-4 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5 border-b pb-1">味わい評価 (1-5)</label>
+                    <div class="space-y-2.5 mt-2" id="rating-inputs-container"></div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">メモ (オプション)</label>
+                    <textarea id="log-notes" rows="2" placeholder="気づきや豆の状態など" class="w-full rounded-md border-gray-300 shadow-sm px-4 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm"></textarea>
+                </div>
+
+                <button type="submit" id="btn-submit" class="w-full bg-slate-900 text-white font-semibold py-2.5 rounded-lg shadow-md hover:bg-slate-800 active:scale-95 transition-all mt-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                    クラウドに記録を保存する
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- タブ2：ログ履歴・検索 -->
+    <section id="tab-content-history" class="tab-hidden">
+        <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100 mb-6">
+            <div class="flex items-center gap-2 mb-4 text-gray-600 font-semibold border-b pb-2 text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                検索・絞り込み
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">豆の名前で検索</label>
+                    <input type="text" id="search-text" placeholder="キーワード入力..." class="w-full rounded border-gray-300 shadow-sm px-3 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">ドリンク種類</label>
+                    <select id="filter-drink" class="w-full rounded border-gray-300 shadow-sm px-3 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm bg-white">
+                        <option value="all">すべて</option>
+                        <option value="black">ブラック</option>
+                        <option value="latte">カフェラテ</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">抽出温度</label>
+                    <select id="filter-temp" class="w-full rounded border-gray-300 shadow-sm px-3 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm bg-white">
+                        <option value="all">すべて</option>
+                        <option value="hot">Hot</option>
+                        <option value="ice">Ice</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">並び替え基準</label>
+                    <select id="sort-criteria" class="w-full rounded border-gray-300 shadow-sm px-3 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm bg-white">
+                        <option value="date">抽出日時</option>
+                        <option value="sweetness">甘み評価</option>
+                        <option value="acidity">酸味評価</option>
+                        <option value="bitterness">苦み評価</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">順序</label>
+                    <button id="btn-sort-order" class="w-full bg-white border border-gray-300 rounded shadow-sm px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none flex justify-between items-center transition-colors">
+                        <span>降順 (新しい順)</span>
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100 min-h-[400px]">
+            <div class="flex items-center gap-2 mb-4 text-gray-600 font-semibold border-b pb-2 text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                ログ一覧
+            </div>
+            <div id="logs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div class="col-span-full text-center text-gray-500 py-10 flex flex-col items-center gap-3">
+                    <svg class="w-8 h-8 animate-spin text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    クラウドからデータを同期中...
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div id="toast-container" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, Timestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAtbibgICThaebwVaLMccxdv0a7QELd9D4",
+        authDomain: "coffee-drip-log.firebaseapp.com",
+        projectId: "coffee-drip-log",
+        storageBucket: "coffee-drip-log.firebasestorage.app",
+        messagingSenderId: "407013958359",
+        appId: "1:407013958359:web:fb27f89df1a07642094692",
+        measurementId: "G-LFKXHQV2FK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const logsCollectionRef = collection(db, 'coffeeLogs');
+
+    let drinkType = 'black';
+    let inputMode = 'beans'; 
+    let flavorMode = 'normal';
+    let currentRecipe = null;
+    let cloudLogs = []; 
+    let filteredLogs = []; 
+    let sortOrder = 'desc'; 
+
+    const RATING_KEYS = [
+        { id: 'acidity', label: '酸味' },
+        { id: 'sweetness', label: '甘み' },
+        { id: 'bitterness', label: '苦み' },
+        { id: 'body', label: 'ボディ' },
+        { id: 'aftertaste', label: '後味' }
+    ];
+
+    const DOM = {
+        btnDrinkBlack: document.getElementById('btn-drink-black'),
+        btnDrinkLatte: document.getElementById('btn-drink-latte'),
+        btnBeans: document.getElementById('btn-type-beans'),
+        btnYield: document.getElementById('btn-type-yield'),
+        btnFlavorSweet: document.getElementById('btn-flavor-sweet'),
+        btnFlavorNormal: document.getElementById('btn-flavor-normal'),
+        btnFlavorAcidic: document.getElementById('btn-flavor-acidic'),
+        inputLabel: document.getElementById('input-label'),
+        baseAmount: document.getElementById('base-amount'),
+        isIceToggle: document.getElementById('is-ice-toggle'),
+        resBeans: document.getElementById('res-beans'),
+        resWater: document.getElementById('res-water'),
+        resHotWater: document.getElementById('res-hot-water'),
+        resIce: document.getElementById('res-ice'),
+        resMilk: document.getElementById('res-milk'),
+        iceSection: document.getElementById('ice-section'),
+        milkSection: document.getElementById('milk-section'),
+        pourList: document.getElementById('pour-list'),
+        logForm: document.getElementById('log-form'),
+        btnSubmit: document.getElementById('btn-submit'),
+        logsContainer: document.getElementById('logs-container'),
+        ratingContainer: document.getElementById('rating-inputs-container'),
+        logNotes: document.getElementById('log-notes'),
+        logDatetime: document.getElementById('log-datetime'),
+        beansList: document.getElementById('beans-list'),
+        searchText: document.getElementById('search-text'),
+        filterDrink: document.getElementById('filter-drink'),
+        filterTemp: document.getElementById('filter-temp'),
+        sortCriteria: document.getElementById('sort-criteria'),
+        btnSortOrder: document.getElementById('btn-sort-order')
+    };
+
+    window.switchTab = function(tabId) {
+        const btnRecord = document.getElementById('tab-btn-record');
+        const btnHistory = document.getElementById('tab-btn-history');
+        const contentRecord = document.getElementById('tab-content-record');
+        const contentHistory = document.getElementById('tab-content-history');
+
+        const activeClass = "border-b-2 border-blue-400 text-blue-400 px-2 h-full flex items-center text-sm font-medium transition-colors";
+        const inactiveClass = "border-b-2 border-transparent text-slate-400 hover:text-slate-300 px-2 h-full flex items-center text-sm font-medium transition-colors";
+
+        if (tabId === 'record') {
+            btnRecord.className = activeClass;
+            btnHistory.className = inactiveClass;
+            contentRecord.classList.remove('tab-hidden');
+            contentHistory.classList.add('tab-hidden');
+        } else {
+            btnHistory.className = activeClass;
+            btnRecord.className = inactiveClass;
+            contentHistory.classList.remove('tab-hidden');
+            contentRecord.classList.add('tab-hidden');
+            applyFiltersAndSort();
+        }
+    };
+
+    function calculateRecipe() {
+        const amount = parseFloat(DOM.baseAmount.value) || 0;
+        const isIce = DOM.isIceToggle.checked;
+        const beans = inputMode === 'beans' ? amount : amount / 15;
+        let baseYield = inputMode === 'beans' ? amount * 15 : amount;
+
+        let milkAmount = 0;
+        if (drinkType === 'latte') {
+            milkAmount = baseYield * 0.5;
+            baseYield = baseYield * 0.5;
+        }
+
+        const iceAmount = isIce ? baseYield * 0.5 : 0;
+        const hotWaterAmount = isIce ? baseYield * 0.5 : baseYield;
+        const phase40 = hotWaterAmount * 0.4;
+        const phase60 = hotWaterAmount * 0.6;
+
+        let p1, p2;
+        if (flavorMode === 'sweet') { p1 = phase40 * 0.4; p2 = phase40 * 0.6; } 
+        else if (flavorMode === 'acidic') { p1 = phase40 * 0.6; p2 = phase40 * 0.4; } 
+        else { p1 = phase40 * 0.5; p2 = phase40 * 0.5; }
+
+        currentRecipe = {
+            drinkType: drinkType,
+            beans: Number(beans.toFixed(1)),
+            totalYield: Number((baseYield + milkAmount).toFixed(0)),
+            isIce: isIce,
+            iceAmount: Number(iceAmount.toFixed(0)),
+            hotWaterAmount: Number(hotWaterAmount.toFixed(0)),
+            milkAmount: Number(milkAmount.toFixed(0)),
+            flavor: flavorMode,
+            pours: [
+                { id: 1, type: '蒸らし', amount: p1, accum: p1 },
+                { id: 2, type: '味調整', amount: p2, accum: p1 + p2 },
+                { id: 3, type: '濃度調整', amount: phase60 / 3, accum: phase40 + (phase60 / 3) },
+                { id: 4, type: '濃度調整', amount: phase60 / 3, accum: phase40 + (phase60 / 3) * 2 },
+                { id: 5, type: '濃度調整', amount: phase60 / 3, accum: hotWaterAmount }
+            ]
+        };
+        renderRecipeUI();
+    }
+
+    function renderRecipeUI() {
+        if (!currentRecipe) return;
+        DOM.resBeans.textContent = `${currentRecipe.beans}g`;
+        DOM.resWater.textContent = `${currentRecipe.totalYield}ml`;
+        DOM.resHotWater.textContent = `お湯: ${currentRecipe.hotWaterAmount}ml`;
+        
+        if (currentRecipe.isIce) {
+            DOM.iceSection.classList.remove('hidden');
+            DOM.resIce.textContent = `${currentRecipe.iceAmount}g`;
+        } else {
+            DOM.iceSection.classList.add('hidden');
+        }
+
+        if (currentRecipe.drinkType === 'latte') {
+            DOM.milkSection.classList.remove('hidden');
+            DOM.resMilk.textContent = `${currentRecipe.milkAmount}ml`;
+        } else {
+            DOM.milkSection.classList.add('hidden');
+        }
+
+        DOM.pourList.innerHTML = currentRecipe.pours.map(pour => `
+            <li class="flex justify-between items-center py-1 border-b border-gray-100 last:border-0">
+                <div><span class="inline-block w-5 text-gray-400 font-bold">${pour.id}</span><span class="text-gray-600">${pour.type}</span></div>
+                <div class="text-right"><span class="font-semibold text-slate-800">${pour.accum.toFixed(0)}ml</span><span class="text-xs text-gray-500 w-14 inline-block">(+${pour.amount.toFixed(0)}ml)</span></div>
+            </li>
+        `).join('');
+    }
+
+    function updateDrinkUI(mode) {
+        drinkType = mode;
+        const active = "flex-1 px-4 py-2 text-sm font-medium border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors";
+        const inactive = "flex-1 px-4 py-2 text-sm font-medium border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors";
+        DOM.btnDrinkBlack.className = inactive + " rounded-l-lg";
+        DOM.btnDrinkLatte.className = inactive + " rounded-r-lg";
+        if (mode === 'black') DOM.btnDrinkBlack.className = active + " rounded-l-lg";
+        if (mode === 'latte') DOM.btnDrinkLatte.className = active + " rounded-r-lg";
+        calculateRecipe();
+    }
+
+    DOM.btnDrinkBlack.addEventListener('click', () => updateDrinkUI('black'));
+    DOM.btnDrinkLatte.addEventListener('click', () => updateDrinkUI('latte'));
+    DOM.btnBeans.addEventListener('click', () => { inputMode = 'beans'; updateCalcUI(DOM.btnBeans, DOM.btnYield, '豆の量 (g)', 15); });
+    DOM.btnYield.addEventListener('click', () => { inputMode = 'yield'; updateCalcUI(DOM.btnYield, DOM.btnBeans, '総量 (ml)', 225); });
+
+    function updateCalcUI(activeBtn, inactiveBtn, labelText, defaultVal) {
+        activeBtn.className = "flex-1 px-4 py-2 text-sm font-medium border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors " + (activeBtn === DOM.btnBeans ? "rounded-l-lg" : "rounded-r-lg");
+        inactiveBtn.className = "flex-1 px-4 py-2 text-sm font-medium border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors " + (inactiveBtn === DOM.btnBeans ? "rounded-l-lg" : "rounded-r-lg");
+        DOM.inputLabel.textContent = labelText;
+        DOM.baseAmount.value = defaultVal;
+        calculateRecipe();
+    }
+
+    function updateFlavorUI(mode) {
+        flavorMode = mode;
+        const active = "flex-1 px-4 py-2 text-sm font-medium border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors";
+        const inactive = "flex-1 px-4 py-2 text-sm font-medium border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors";
+        DOM.btnFlavorSweet.className = inactive + " rounded-l-lg";
+        DOM.btnFlavorNormal.className = inactive;
+        DOM.btnFlavorAcidic.className = inactive + " rounded-r-lg";
+        if (mode === 'sweet') DOM.btnFlavorSweet.className = active + " rounded-l-lg";
+        if (mode === 'normal') DOM.btnFlavorNormal.className = active;
+        if (mode === 'acidic') DOM.btnFlavorAcidic.className = active + " rounded-r-lg";
+        calculateRecipe();
+    }
+    
+    DOM.btnFlavorSweet.addEventListener('click', () => updateFlavorUI('sweet'));
+    DOM.btnFlavorNormal.addEventListener('click', () => updateFlavorUI('normal'));
+    DOM.btnFlavorAcidic.addEventListener('click', () => updateFlavorUI('acidic'));
+    DOM.baseAmount.addEventListener('input', calculateRecipe);
+    DOM.isIceToggle.addEventListener('change', calculateRecipe);
+
+    function generateRatingUI(prefix, defaultValues = {}) {
+        return RATING_KEYS.map(item => {
+            const val = defaultValues[item.id] || 3; 
+            const buttons = [1, 2, 3, 4, 5].map(num => `
+                <label class="cursor-pointer">
+                    <input type="radio" name="${prefix}_${item.id}" value="${num}" class="peer sr-only" ${num === val ? 'checked' : ''}>
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center border peer-checked:bg-yellow-400 peer-checked:text-white peer-checked:border-yellow-400 text-gray-400 hover:bg-gray-100 transition-colors text-sm">${num}</div>
+                </label>
+            `).join('');
+            return `<div class="flex items-center justify-between"><span class="text-sm font-medium text-gray-600 w-12">${item.label}</span><div class="flex gap-1 sm:gap-1.5">${buttons}</div></div>`;
+        }).join('');
+    }
+    DOM.ratingContainer.innerHTML = generateRatingUI('new');
+
+    const q = query(logsCollectionRef, orderBy("createdAt", "desc"));
+    onSnapshot(q, (snapshot) => {
+        cloudLogs = [];
+        snapshot.forEach((doc) => {
+            cloudLogs.push({ id: doc.id, ...doc.data() });
+        });
+        updateBeansDatalist();
+        applyFiltersAndSort();
+    });
+
+    function updateBeansDatalist() {
+        const uniqueBeans = [...new Set(cloudLogs.map(log => log.beansName))];
+        DOM.beansList.innerHTML = uniqueBeans.map(name => `<option value="${name}"></option>`).join('');
+    }
+
+    DOM.btnSortOrder.addEventListener('click', () => {
+        sortOrder = sortOrder === 'desc' ? 'asc' : 'desc';
+        const labelText = sortOrder === 'desc' ? '降順 (新しい/高い順)' : '昇順 (古い/低い順)';
+        const iconSvg = sortOrder === 'desc' 
+            ? '<svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>'
+            : '<svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>';
+        DOM.btnSortOrder.innerHTML = `<span>${labelText}</span>${iconSvg}`;
+        applyFiltersAndSort();
+    });
+
+    function applyFiltersAndSort() {
+        const searchText = DOM.searchText.value.toLowerCase();
+        const filterDrinkVal = DOM.filterDrink.value;
+        const filterTempVal = DOM.filterTemp.value;
+        const sortCriteriaVal = DOM.sortCriteria.value;
+
+        filteredLogs = cloudLogs.filter(log => {
+            const matchText = log.beansName.toLowerCase().includes(searchText);
+            let matchDrink = true;
+            const logDrink = log.recipe.drinkType || 'black';
+            if (filterDrinkVal !== 'all') matchDrink = logDrink === filterDrinkVal;
+            let matchTemp = true;
+            if (filterTempVal === 'hot') matchTemp = !log.recipe.isIce;
+            if (filterTempVal === 'ice') matchTemp = log.recipe.isIce;
+            return matchText && matchDrink && matchTemp;
+        });
+
+        filteredLogs.sort((a, b) => {
+            let valA, valB;
+            if (sortCriteriaVal === 'date') {
+                valA = a.createdAt ? a.createdAt.toMillis() : 0;
+                valB = b.createdAt ? b.createdAt.toMillis() : 0;
+            } else {
+                valA = a.ratings[sortCriteriaVal] || 0;
+                valB = b.ratings[sortCriteriaVal] || 0;
+            }
+            return (valB - valA) * (sortOrder === 'desc' ? 1 : -1);
+        });
+
+        renderLogs();
+    }
+
+    DOM.searchText.addEventListener('input', applyFiltersAndSort);
+    DOM.filterDrink.addEventListener('change', applyFiltersAndSort);
+    DOM.filterTemp.addEventListener('change', applyFiltersAndSort);
+    DOM.sortCriteria.addEventListener('change', applyFiltersAndSort);
+
+    DOM.logForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        DOM.btnSubmit.disabled = true;
+        DOM.btnSubmit.textContent = '保存中...';
+
+        const ratings = {};
+        RATING_KEYS.forEach(item => {
+            ratings[item.id] = parseInt(document.querySelector(`input[name="new_${item.id}"]:checked`).value, 10);
+        });
+
+        let logDateObj;
+        if (DOM.logDatetime.value) {
+            logDateObj = new Date(DOM.logDatetime.value);
+        } else {
+            logDateObj = new Date();
+        }
+        const firestoreTimestamp = Timestamp.fromDate(logDateObj);
+
+        const newLogData = {
+            beansName: document.getElementById('log-beans-name').value,
+            grind: document.getElementById('log-grind').value,
+            temp: document.getElementById('log-temp').value,
+            notes: DOM.logNotes.value,
+            ratings: ratings,
+            recipe: currentRecipe,
+            createdAt: firestoreTimestamp
+        };
+
+        try {
+            await addDoc(logsCollectionRef, newLogData);
+            showToast('クラウドに記録を保存しました！');
+            DOM.logForm.reset();
+            DOM.ratingContainer.innerHTML = generateRatingUI('new');
+            updateFlavorUI('normal');
+            updateDrinkUI('black');
+            switchTab('history');
+        } catch (error) {
+            console.error("Error adding document: ", error);
+            showToast('保存に失敗しました', true);
+        } finally {
+            DOM.btnSubmit.disabled = false;
+            DOM.btnSubmit.textContent = 'クラウドに記録を保存する';
+        }
+    });
+
+    function renderLogs() {
+        if (filteredLogs.length === 0) {
+            DOM.logsContainer.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10 border-2 border-dashed border-gray-200 rounded-xl">条件に一致する記録がありません。</div>`;
+            return;
+        }
+
+        DOM.logsContainer.innerHTML = filteredLogs.map(log => {
+            const logDate = log.createdAt ? log.createdAt.toDate() : new Date();
+            const dateStr = logDate.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
+            
+            const tempBadge = log.recipe.isIce 
+                ? '<span class="bg-blue-100 text-blue-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Ice</span>'
+                : '<span class="bg-orange-100 text-orange-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Hot</span>';
+            
+            const isLatte = log.recipe.drinkType === 'latte';
+            const drinkBadge = isLatte
+                ? '<span class="bg-stone-200 text-stone-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Latte</span>'
+                : '<span class="bg-slate-200 text-slate-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Black</span>';
+
+            const flavorLabels = { sweet: '甘味', normal: '通常', acidic: '酸味' };
+            const flavorName = log.recipe.flavor ? flavorLabels[log.recipe.flavor] : '通常';
+
+            const displayRatings = RATING_KEYS.map(item => `
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-gray-500">${item.label}</span>
+                    <div class="flex gap-0.5">
+                        ${Array(5).fill(0).map((_, i) => `
+                            <svg class="w-3.5 h-3.5 ${i < log.ratings[item.id] ? 'text-yellow-400' : 'text-gray-200'}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            const notesHtml = log.notes ? `<div class="mt-2.5 p-2 bg-yellow-50 text-gray-700 text-xs rounded border border-yellow-100 leading-tight"><svg class="w-3.5 h-3.5 inline-block text-yellow-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>${log.notes.replace(/\n/g, '<br>')}</div>` : '';
+            const detailMilk = isLatte ? `<div><span class="block text-[10px] text-gray-400">ミルク</span>${log.recipe.milkAmount}ml</div>` : '';
+
+            return `
+                <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow h-fit">
+                    <div class="flex flex-col gap-1 mb-3 pb-2 border-b border-gray-50">
+                        <h3 class="font-bold text-gray-800 text-sm leading-tight">${log.beansName}</h3>
+                        <div class="flex items-center justify-between mt-1">
+                            <div class="flex gap-1">${drinkBadge}${tempBadge}</div>
+                            <span class="text-[10px] text-gray-400">${dateStr}</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-y-2.5 gap-x-2 text-xs text-gray-600 mb-3 bg-gray-50 p-2.5 rounded">
+                        <div><span class="block text-[10px] text-gray-400">豆量</span>${log.recipe.beans}g</div>
+                        <div><span class="block text-[10px] text-gray-400">傾向</span>${flavorName}</div>
+                        <div><span class="block text-[10px] text-gray-400">湯温</span>${log.temp}℃</div>
+                        <div><span class="block text-[10px] text-gray-400">挽目</span>${log.grind}</div>
+                        ${isLatte ? detailMilk : ''}
+                    </div>
+                    <div id="display-ratings-${log.id}" class="space-y-1 mb-2">${displayRatings}</div>
+                    ${notesHtml}
+                    <div id="edit-ratings-${log.id}" class="hidden space-y-2 mb-2 bg-white border p-3 rounded-lg">
+                        <p class="text-xs font-bold text-gray-500 mb-1">評価を編集</p>
+                        ${generateRatingUI(`edit_${log.id}`, log.ratings)}
+                    </div>
+                    <div class="flex justify-end gap-2 mt-3 border-t pt-3">
+                        <button id="btn-edit-${log.id}" onclick="window.toggleEditMode('${log.id}')" class="text-xs px-2.5 py-1 text-slate-600 border border-slate-300 rounded hover:bg-slate-50 transition-colors">評価修正</button>
+                        <button id="btn-save-${log.id}" onclick="window.saveEdit('${log.id}')" class="hidden text-xs px-2.5 py-1 bg-slate-800 text-white rounded hover:bg-slate-700 transition-colors">クラウドに確定</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    window.toggleEditMode = function(id) {
+        document.getElementById(`display-ratings-${id}`).classList.add('hidden');
+        document.getElementById(`edit-ratings-${id}`).classList.remove('hidden');
+        document.getElementById(`btn-edit-${id}`).classList.add('hidden');
+        document.getElementById(`btn-save-${id}`).classList.remove('hidden');
+    };
+
+    window.saveEdit = async function(id) {
+        const targetLog = cloudLogs.find(log => log.id === id);
+        if(targetLog) {
+            const updatedRatings = {};
+            RATING_KEYS.forEach(item => {
+                const checked = document.querySelector(`input[name="edit_${id}_${item.id}"]:checked`);
+                if(checked) updatedRatings[item.id] = parseInt(checked.value, 10);
+            });
+
+            try {
+                const logDocRef = doc(db, 'coffeeLogs', id);
+                await updateDoc(logDocRef, { ratings: updatedRatings });
+                showToast('評価を更新しました');
+            } catch (error) {
+                console.error("Error updating document: ", error);
+                showToast('更新に失敗しました', true);
+            }
+        }
+    };
+
+    function showToast(message, isError = false) {
+        const toast = document.createElement('div');
+        const bgColor = isError ? 'bg-red-600' : 'bg-slate-800';
+        const iconColor = isError ? 'text-white' : 'text-green-400';
+        toast.className = `toast-enter ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium flex items-center gap-2`;
+        toast.innerHTML = `<svg class="w-4 h-4 ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> ${message}`;
+        document.getElementById('toast-container').appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s ease'; setTimeout(() => toast.remove(), 300); }, 3000);
+    }
+
+    calculateRecipe();
+</script>
+</body>
+</html>
