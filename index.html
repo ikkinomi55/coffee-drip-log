@@ -33,14 +33,12 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 BrewLog <span class="text-xs text-blue-300 font-normal mt-0.5">4:6</span>
             </h1>
-            <!-- ログイン後にのみ表示されるナビゲーションタブ -->
             <nav id="desktop-nav" class="hidden space-x-4 h-full pt-1" aria-label="Tabs">
                 <button onclick="switchTab('record')" id="tab-btn-record" class="border-b-2 border-blue-400 text-blue-400 px-2 h-full flex items-center text-sm font-medium transition-colors">記録する</button>
                 <button onclick="switchTab('history')" id="tab-btn-history" class="border-b-2 border-transparent text-slate-400 hover:text-slate-300 px-2 h-full flex items-center text-sm font-medium transition-colors">履歴・検索</button>
             </nav>
         </div>
 
-        <!-- 認証ステータス・ログアウトUI（ログイン後のみ表示） -->
         <div id="header-auth-area" class="hidden items-center gap-3">
             <div class="text-xs text-green-400 font-semibold flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
@@ -57,7 +55,7 @@
     </div>
 </header>
 
-<!-- 1. 初期認証確認中画面（URL直打ち時も認証完了まで本体を描画しない） -->
+<!-- 初期認証確認中画面 -->
 <div id="auth-loading-screen" class="max-w-md mx-auto px-4 py-24 text-center">
     <div class="glass-panel rounded-2xl shadow-sm p-8 border border-gray-100 flex flex-col items-center gap-3">
         <svg class="w-8 h-8 animate-spin text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -65,7 +63,7 @@
     </div>
 </div>
 
-<!-- 2. 未ログイン時専用画面（ログインボタンのみ表示） -->
+<!-- 未ログイン時専用画面 -->
 <div id="login-gate-screen" class="hidden max-w-md mx-auto px-4 py-24">
     <div class="glass-panel rounded-2xl shadow-sm p-8 border border-gray-200 text-center">
         <div class="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center mx-auto mb-4">
@@ -80,7 +78,7 @@
     </div>
 </div>
 
-<!-- 3. アプリ本体（初期状態はhidden：ログイン認証成功後にのみ表示） -->
+<!-- アプリ本体 -->
 <main id="app-main-container" class="hidden max-w-5xl mx-auto px-4 py-6">
     
     <!-- タブ1：計算＆登録フォーム -->
@@ -177,7 +175,6 @@
                     <datalist id="beans-list"></datalist>
                 </div>
                 
-                <!-- 挽目・湯温：デフォルト18 / 83℃ ＋ リスト選択と数値直接入力のハイブリッドUI -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">挽目 (C3)</label>
@@ -195,7 +192,6 @@
                     </div>
                 </div>
 
-                <!-- 5項目評価 ＋ 5項目合計リアルタイム表示 -->
                 <div>
                     <div class="flex items-center justify-between mb-1.5 border-b pb-1.5">
                         <label class="block text-sm font-medium text-gray-700">味わい評価 (1-5)</label>
@@ -206,7 +202,6 @@
                     <div class="space-y-2.5 mt-2" id="rating-inputs-container"></div>
                 </div>
 
-                <!-- 総合点 (100点満点の手入力) -->
                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
                     <div class="flex items-center justify-between gap-3">
                         <div>
@@ -284,20 +279,24 @@
             </div>
         </div>
 
-        <!-- CSV エクスポート / インポートパネル -->
+        <!-- CSVバックアップ・移行パネル -->
         <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100 mb-6">
             <div class="flex items-center justify-between mb-3 border-b pb-2">
                 <div class="flex items-center gap-2 text-gray-600 font-semibold text-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                    CSVバックアップ・移行
+                    CSVバックアップ・データ移行
                 </div>
                 <span id="log-count-badge" class="text-xs text-gray-500">0件</span>
             </div>
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center gap-2.5">
                     <button type="button" id="btn-export-csv" class="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-sm transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                         CSVエクスポート
+                    </button>
+                    <button type="button" id="btn-migrate-legacy" class="inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold px-3.5 py-2.5 rounded-lg shadow-sm transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
+                        旧データを移行
                     </button>
                 </div>
                 <div class="flex flex-col sm:flex-row sm:items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
@@ -333,7 +332,7 @@
     </section>
 </main>
 
-<!-- スマホ専用 ボトムナビゲーション（初期状態はhidden：ログイン後にのみ表示） -->
+<!-- スマホ専用 ボトムナビゲーション -->
 <nav id="mobile-bottom-nav" class="hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 justify-around items-center h-16 z-50 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
     <button onclick="switchTab('record')" id="bottom-tab-btn-record" class="flex-1 flex flex-col items-center justify-center h-full text-blue-600 transition-colors">
         <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
@@ -461,6 +460,7 @@
         logCountBadge: document.getElementById('log-count-badge'),
 
         btnExportCsv: document.getElementById('btn-export-csv'),
+        btnMigrateLegacy: document.getElementById('btn-migrate-legacy'),
         btnImportCsv: document.getElementById('btn-import-csv'),
         csvFileInput: document.getElementById('csv-file-input'),
         
@@ -499,7 +499,6 @@
     DOM.btnLoginGate.addEventListener('click', handleLogin);
     DOM.btnLogout.addEventListener('click', handleLogout);
 
-    // 厳格な認証ゲート制御：未ログイン時はアプリ本体・ナビゲーションをすべて非表示
     onAuthStateChanged(auth, (user) => {
         if (unsubscribeLogs) {
             unsubscribeLogs();
@@ -510,7 +509,6 @@
         DOM.authLoadingScreen.classList.add('hidden');
 
         if (user) {
-            // ログインゲートを隠し、アプリ本体とナビゲーションを表示
             DOM.loginGateScreen.classList.add('hidden');
             DOM.appMainContainer.classList.remove('hidden');
             
@@ -531,7 +529,6 @@
                 DOM.userAvatar.classList.add('hidden');
             }
 
-            // URLハッシュに #history が指定されていた場合の初期タブ反映
             if (window.location.hash === '#history') {
                 switchTab('history');
             } else {
@@ -551,7 +548,6 @@
                 showToast('データの同期に失敗しました', true);
             });
         } else {
-            // 未ログイン時：アプリ本体・ナビゲーション・データを完全に隠蔽しログインボタンのみ表示
             cloudLogs = [];
             filteredLogs = [];
             DOM.logsContainer.innerHTML = '';
@@ -568,7 +564,7 @@
         }
     });
 
-    // 挽目・湯温のハイブリッド入力（数値直接入力 ＋ リスト選択の双方向同期）
+    // 挽目・湯温のハイブリッド入力
     function populateSelectOptions(selectEl, min, max, step, unit, defaultVal) {
         let html = `<option value="">リスト選択</option>`;
         for (let v = min; v <= max; v += step) {
@@ -596,7 +592,6 @@
     bindHybridInput(DOM.logGrind, DOM.logGrindSelect);
     bindHybridInput(DOM.logTemp, DOM.logTempSelect);
 
-    // タブ切り替え（未ログイン時は実行をブロック）
     window.switchTab = function(tabId) {
         if (!currentUser) return;
 
@@ -627,7 +622,6 @@
         window.scrollTo(0, 0);
     };
 
-    // 4:6メソッド レシピ計算
     function calculateRecipe() {
         const amount = parseFloat(DOM.baseAmount.value) || 0;
         const isIce = DOM.isIceToggle.checked;
@@ -1002,8 +996,7 @@
 
             const radarSvg = renderPentagonRadarSVG(log.ratings);
 
-            const notesHtml = log.notes ? `<div class="mt-2.5 p-2 bg-yellow-50 text-gray-700 text-xs rounded border border-yellow-100 leading-tight"><svg class="w-3.5 h-3.5 inline-block text-yellow-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>${String(log.notes).replace(/
-/g, '<br>')}</div>` : '';
+            const notesHtml = log.notes ? `<div class="mt-2.5 p-2 bg-yellow-50 text-gray-700 text-xs rounded border border-yellow-100 leading-tight"><svg class="w-3.5 h-3.5 inline-block text-yellow-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>${String(log.notes).replace(/\n/g, '<br>')}</div>` : '';
             const detailMilk = isLatte ? `<div><span class="block text-[10px] text-gray-400">ミルク</span>${recipe.milkAmount}ml</div>` : '';
 
             return `
@@ -1167,6 +1160,51 @@
         }
     };
 
+    // --- 旧データ（ルート直下 coffeeLogs）からの一括移行 ---
+    DOM.btnMigrateLegacy.addEventListener('click', async () => {
+        if (!currentUser) return;
+        DOM.btnMigrateLegacy.disabled = true;
+        try {
+            const legacySnap = await getDocs(collection(db, 'coffeeLogs'));
+            if (legacySnap.empty) {
+                showToast('移行可能な旧データが見つかりませんでした', true);
+                return;
+            }
+
+            const count = legacySnap.size;
+            if (!confirm(`旧データベースから ${count} 件の履歴が見つかりました。\n現在のアカウント（${currentUser.email}）へコピーして移行しますか？`)) {
+                return;
+            }
+
+            const legacyDocs = legacySnap.docs;
+            const userLogsRef = getUserLogsRef(currentUser.uid);
+
+            for (let i = 0; i < legacyDocs.length; i += 450) {
+                const batch = writeBatch(db);
+                legacyDocs.slice(i, i + 450).forEach(d => {
+                    const data = d.data();
+                    const ratings = data.ratings || { acidity: 3, sweetness: 3, bitterness: 3, body: 3, aftertaste: 3 };
+                    const migratedData = {
+                        ...data,
+                        ratings: ratings,
+                        ratingSum: calcRatingSum(ratings),
+                        overallScore: data.overallScore !== undefined ? data.overallScore : null
+                    };
+                    batch.set(doc(userLogsRef), migratedData);
+                });
+                await batch.commit();
+            }
+
+            showToast(`${count}件の過去データを移行しました！`);
+        } catch (error) {
+            console.error('Migration error:', error);
+            showToast('移行に失敗しました（セキュリティルールを確認してください）', true);
+        } finally {
+            DOM.btnMigrateLegacy.disabled = false;
+        }
+    });
+
+    // --- CSV エクスポート ---
     function escapeCsvField(val) {
         if (val === null || val === undefined) return '';
         const str = String(val);
@@ -1232,6 +1270,7 @@
         showToast(`${cloudLogs.length}件のCSVをエクスポートしました`);
     });
 
+    // --- CSV インポート ---
     function parseCsvText(text) {
         const cleanText = text.replace(/^\uFEFF/, '');
         const rows = [];
