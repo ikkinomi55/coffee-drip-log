@@ -17,7 +17,6 @@
         .toggle-checkbox:checked { right: 0; border-color: #3B82F6; }
         .toggle-checkbox:checked + .toggle-label { background-color: #3B82F6; }
         .tab-hidden { display: none !important; }
-        /* iPhoneのホームバー(下部の線)にかぶらないようにする安全余白 */
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
     </style>
     
@@ -25,7 +24,6 @@
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" href="./favicon.ico" sizes="any">
 </head>
-<!-- スマホ時はボトムバー分の余白(pb-24)を確保、PC時(sm:)は元のpb-8に戻す -->
 <body class="text-gray-800 antialiased min-h-screen pb-24 sm:pb-8">
 
 <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40">
@@ -35,19 +33,55 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 BrewLog <span class="text-xs text-blue-300 font-normal mt-0.5">4:6</span>
             </h1>
-            <!-- スマホ(sm未満)では上部のタブを隠す -->
-            <nav class="hidden sm:flex space-x-4 h-full pt-1" aria-label="Tabs">
+            <!-- ログイン後にのみ表示されるナビゲーションタブ -->
+            <nav id="desktop-nav" class="hidden space-x-4 h-full pt-1" aria-label="Tabs">
                 <button onclick="switchTab('record')" id="tab-btn-record" class="border-b-2 border-blue-400 text-blue-400 px-2 h-full flex items-center text-sm font-medium transition-colors">記録する</button>
                 <button onclick="switchTab('history')" id="tab-btn-history" class="border-b-2 border-transparent text-slate-400 hover:text-slate-300 px-2 h-full flex items-center text-sm font-medium transition-colors">履歴・検索</button>
             </nav>
         </div>
-        <div class="text-xs text-green-400 font-semibold flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> <span class="hidden sm:inline">Cloud Sync</span>
+
+        <!-- 認証ステータス・ログアウトUI（ログイン後のみ表示） -->
+        <div id="header-auth-area" class="hidden items-center gap-3">
+            <div class="text-xs text-green-400 font-semibold flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                <span class="hidden sm:inline">Cloud Sync</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <img id="user-avatar" src="" alt="User" class="w-7 h-7 rounded-full border border-slate-600 hidden">
+                <span id="user-name" class="text-xs text-slate-300 hidden md:inline max-w-[140px] truncate"></span>
+                <button type="button" id="btn-logout" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded border border-slate-700 transition-colors">
+                    ログアウト
+                </button>
+            </div>
         </div>
     </div>
 </header>
 
-<main class="max-w-5xl mx-auto px-4 py-6">
+<!-- 1. 初期認証確認中画面（URL直打ち時も認証完了まで本体を描画しない） -->
+<div id="auth-loading-screen" class="max-w-md mx-auto px-4 py-24 text-center">
+    <div class="glass-panel rounded-2xl shadow-sm p-8 border border-gray-100 flex flex-col items-center gap-3">
+        <svg class="w-8 h-8 animate-spin text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        <p class="text-sm font-medium text-gray-600">認証状態を確認中...</p>
+    </div>
+</div>
+
+<!-- 2. 未ログイン時専用画面（ログインボタンのみ表示） -->
+<div id="login-gate-screen" class="hidden max-w-md mx-auto px-4 py-24">
+    <div class="glass-panel rounded-2xl shadow-sm p-8 border border-gray-200 text-center">
+        <div class="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+        </div>
+        <h2 class="text-lg font-bold text-slate-900 mb-2">BrewLog 4:6</h2>
+        <p class="text-xs text-gray-500 mb-6">このアプリを利用するにはGoogleアカウントでのログインが必要です。</p>
+        <button type="button" id="btn-login-gate" class="w-full inline-flex items-center justify-center gap-2.5 bg-slate-900 hover:bg-slate-800 active:scale-95 text-white text-sm font-semibold px-5 py-3 rounded-xl shadow-md transition-all">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27 3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10 5.35 0 9.25-3.67 9.25-9.09 0-1.15-.15-1.81-.15-1.81z"/></svg>
+            Googleでログイン
+        </button>
+    </div>
+</div>
+
+<!-- 3. アプリ本体（初期状態はhidden：ログイン認証成功後にのみ表示） -->
+<main id="app-main-container" class="hidden max-w-5xl mx-auto px-4 py-6">
     
     <!-- タブ1：計算＆登録フォーム -->
     <section id="tab-content-record" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -143,20 +177,47 @@
                     <datalist id="beans-list"></datalist>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4">
+                <!-- 挽目・湯温：デフォルト18 / 83℃ ＋ リスト選択と数値直接入力のハイブリッドUI -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">挽目 (C3)</label>
-                        <input type="number" id="log-grind" placeholder="例: 13" required class="w-full rounded-md border-gray-300 shadow-sm px-4 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm">
+                        <div class="flex gap-1.5">
+                            <input type="number" id="log-grind" value="18" step="0.5" min="1" max="50" inputmode="decimal" required class="w-1/2 rounded-md border-gray-300 shadow-sm px-3 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm font-semibold">
+                            <select id="log-grind-select" aria-label="挽目リスト選択" class="w-1/2 rounded-md border-gray-300 shadow-sm px-2 py-2 border bg-white focus:ring-slate-500 focus:border-slate-500 text-sm text-gray-700"></select>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">湯温 (℃)</label>
-                        <input type="number" id="log-temp" value="92" class="w-full rounded-md border-gray-300 shadow-sm px-4 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm">
+                        <div class="flex gap-1.5">
+                            <input type="number" id="log-temp" value="83" step="0.5" min="40" max="100" inputmode="decimal" required class="w-1/2 rounded-md border-gray-300 shadow-sm px-3 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm font-semibold">
+                            <select id="log-temp-select" aria-label="湯温リスト選択" class="w-1/2 rounded-md border-gray-300 shadow-sm px-2 py-2 border bg-white focus:ring-slate-500 focus:border-slate-500 text-sm text-gray-700"></select>
+                        </div>
                     </div>
                 </div>
 
+                <!-- 5項目評価 ＋ 5項目合計リアルタイム表示 -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5 border-b pb-1">味わい評価 (1-5)</label>
+                    <div class="flex items-center justify-between mb-1.5 border-b pb-1.5">
+                        <label class="block text-sm font-medium text-gray-700">味わい評価 (1-5)</label>
+                        <div class="bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs font-bold text-amber-800">
+                            5項目合計: <span id="new-rating-sum" class="text-sm text-amber-900">15</span> / 25点
+                        </div>
+                    </div>
                     <div class="space-y-2.5 mt-2" id="rating-inputs-container"></div>
+                </div>
+
+                <!-- 総合点 (100点満点の手入力) -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <label for="log-overall-score" class="block text-sm font-bold text-slate-800">総合点 (100点満点)</label>
+                            <span class="text-[11px] text-gray-500">主観での総合評価を数値入力</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <input type="number" id="log-overall-score" min="0" max="100" step="1" placeholder="85" inputmode="numeric" class="w-24 text-right rounded-md border-gray-300 shadow-sm px-3 py-2 border focus:ring-slate-500 focus:border-slate-500 text-base font-bold text-slate-900">
+                            <span class="text-sm font-medium text-gray-600">点</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div>
@@ -173,10 +234,11 @@
 
     <!-- タブ2：ログ履歴・検索 -->
     <section id="tab-content-history" class="tab-hidden">
-        <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100 mb-6">
+        <!-- 検索・絞り込み・ソート -->
+        <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100 mb-5">
             <div class="flex items-center gap-2 mb-4 text-gray-600 font-semibold border-b pb-2 text-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                検索・絞り込み
+                検索・絞り込み・並び替え
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 <div>
@@ -203,38 +265,76 @@
                     <label class="block text-xs font-bold text-gray-500 mb-1">並び替え基準</label>
                     <select id="sort-criteria" class="w-full rounded border-gray-300 shadow-sm px-3 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm bg-white">
                         <option value="date">抽出日時</option>
+                        <option value="overallScore">総合点 (100点満点)</option>
+                        <option value="ratingSum">5項目合計点</option>
                         <option value="sweetness">甘み評価</option>
                         <option value="acidity">酸味評価</option>
                         <option value="bitterness">苦み評価</option>
+                        <option value="body">ボディ評価</option>
+                        <option value="aftertaste">後味評価</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-500 mb-1">順序</label>
-                    <button id="btn-sort-order" class="w-full bg-white border border-gray-300 rounded shadow-sm px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none flex justify-between items-center transition-colors">
-                        <span>降順 (新しい順)</span>
+                    <button type="button" id="btn-sort-order" class="w-full bg-white border border-gray-300 rounded shadow-sm px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none flex justify-between items-center transition-colors">
+                        <span>降順 (新しい/高い順)</span>
                         <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                 </div>
             </div>
         </div>
 
+        <!-- CSV エクスポート / インポートパネル -->
+        <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100 mb-6">
+            <div class="flex items-center justify-between mb-3 border-b pb-2">
+                <div class="flex items-center gap-2 text-gray-600 font-semibold text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                    CSVバックアップ・移行
+                </div>
+                <span id="log-count-badge" class="text-xs text-gray-500">0件</span>
+            </div>
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <button type="button" id="btn-export-csv" class="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-sm transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        CSVエクスポート
+                    </button>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <div class="flex items-center gap-4 text-xs font-medium text-gray-700">
+                        <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                            <input type="radio" name="csv-import-mode" value="append" checked class="text-blue-600 focus:ring-blue-500">
+                            <span>追記する</span>
+                        </label>
+                        <label class="inline-flex items-center gap-1.5 cursor-pointer text-red-700">
+                            <input type="radio" name="csv-import-mode" value="overwrite" class="text-red-600 focus:ring-red-500">
+                            <span>上書き変更する</span>
+                        </label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="file" id="csv-file-input" accept=".csv,text/csv" class="hidden">
+                        <button type="button" id="btn-import-csv" class="inline-flex items-center gap-1.5 bg-white hover:bg-gray-50 text-slate-800 border border-slate-300 text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            CSVを選択してインポート
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ログ一覧 -->
         <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100 min-h-[400px]">
             <div class="flex items-center gap-2 mb-4 text-gray-600 font-semibold border-b pb-2 text-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
                 ログ一覧
             </div>
-            <div id="logs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                <div class="col-span-full text-center text-gray-500 py-10 flex flex-col items-center gap-3">
-                    <svg class="w-8 h-8 animate-spin text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    クラウドからデータを同期中...
-                </div>
-            </div>
+            <div id="logs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
         </div>
     </section>
 </main>
 
-<!-- スマホ専用 ボトムナビゲーション -->
-<nav class="sm:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex justify-around items-center h-16 z-50 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+<!-- スマホ専用 ボトムナビゲーション（初期状態はhidden：ログイン後にのみ表示） -->
+<nav id="mobile-bottom-nav" class="hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 justify-around items-center h-16 z-50 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
     <button onclick="switchTab('record')" id="bottom-tab-btn-record" class="flex-1 flex flex-col items-center justify-center h-full text-blue-600 transition-colors">
         <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
         <span class="text-[10px] font-bold">記録する</span>
@@ -249,7 +349,27 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, Timestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+    import { 
+        getAuth, 
+        GoogleAuthProvider, 
+        signInWithPopup, 
+        signOut, 
+        onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+    import { 
+        getFirestore, 
+        collection, 
+        addDoc, 
+        onSnapshot, 
+        query, 
+        orderBy, 
+        doc, 
+        updateDoc, 
+        deleteDoc,
+        writeBatch,
+        getDocs,
+        Timestamp 
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAtbibgICThaebwVaLMccxdv0a7QELd9D4",
@@ -262,8 +382,12 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
-    const logsCollectionRef = collection(db, 'coffeeLogs');
+    const provider = new GoogleAuthProvider();
+
+    let currentUser = null;
+    let unsubscribeLogs = null;
 
     let drinkType = 'black';
     let inputMode = 'beans'; 
@@ -272,6 +396,9 @@
     let cloudLogs = []; 
     let filteredLogs = []; 
     let sortOrder = 'desc'; 
+
+    const DEFAULT_GRIND = 18;
+    const DEFAULT_TEMP = 83;
 
     const RATING_KEYS = [
         { id: 'acidity', label: '酸味' },
@@ -282,6 +409,17 @@
     ];
 
     const DOM = {
+        authLoadingScreen: document.getElementById('auth-loading-screen'),
+        loginGateScreen: document.getElementById('login-gate-screen'),
+        appMainContainer: document.getElementById('app-main-container'),
+        desktopNav: document.getElementById('desktop-nav'),
+        mobileBottomNav: document.getElementById('mobile-bottom-nav'),
+        headerAuthArea: document.getElementById('header-auth-area'),
+        btnLoginGate: document.getElementById('btn-login-gate'),
+        btnLogout: document.getElementById('btn-logout'),
+        userAvatar: document.getElementById('user-avatar'),
+        userName: document.getElementById('user-name'),
+
         btnDrinkBlack: document.getElementById('btn-drink-black'),
         btnDrinkLatte: document.getElementById('btn-drink-latte'),
         btnBeans: document.getElementById('btn-type-beans'),
@@ -300,18 +438,31 @@
         iceSection: document.getElementById('ice-section'),
         milkSection: document.getElementById('milk-section'),
         pourList: document.getElementById('pour-list'),
+
         logForm: document.getElementById('log-form'),
         btnSubmit: document.getElementById('btn-submit'),
+        logGrind: document.getElementById('log-grind'),
+        logGrindSelect: document.getElementById('log-grind-select'),
+        logTemp: document.getElementById('log-temp'),
+        logTempSelect: document.getElementById('log-temp-select'),
+        newRatingSum: document.getElementById('new-rating-sum'),
+        logOverallScore: document.getElementById('log-overall-score'),
         logsContainer: document.getElementById('logs-container'),
         ratingContainer: document.getElementById('rating-inputs-container'),
         logNotes: document.getElementById('log-notes'),
         logDatetime: document.getElementById('log-datetime'),
         beansList: document.getElementById('beans-list'),
+
         searchText: document.getElementById('search-text'),
         filterDrink: document.getElementById('filter-drink'),
         filterTemp: document.getElementById('filter-temp'),
         sortCriteria: document.getElementById('sort-criteria'),
         btnSortOrder: document.getElementById('btn-sort-order'),
+        logCountBadge: document.getElementById('log-count-badge'),
+
+        btnExportCsv: document.getElementById('btn-export-csv'),
+        btnImportCsv: document.getElementById('btn-import-csv'),
+        csvFileInput: document.getElementById('csv-file-input'),
         
         tabBtnRecord: document.getElementById('tab-btn-record'),
         tabBtnHistory: document.getElementById('tab-btn-history'),
@@ -321,7 +472,134 @@
         contentHistory: document.getElementById('tab-content-history')
     };
 
+    function getUserLogsRef(uid) {
+        return collection(db, 'users', uid, 'coffeeLogs');
+    }
+
+    async function handleLogin() {
+        try {
+            await signInWithPopup(auth, provider);
+            showToast('ログインしました');
+        } catch (error) {
+            console.error('Login error:', error);
+            showToast('ログインに失敗しました: ' + error.message, true);
+        }
+    }
+
+    async function handleLogout() {
+        try {
+            await signOut(auth);
+            showToast('ログアウトしました');
+        } catch (error) {
+            console.error('Logout error:', error);
+            showToast('ログアウトに失敗しました', true);
+        }
+    }
+
+    DOM.btnLoginGate.addEventListener('click', handleLogin);
+    DOM.btnLogout.addEventListener('click', handleLogout);
+
+    // 厳格な認証ゲート制御：未ログイン時はアプリ本体・ナビゲーションをすべて非表示
+    onAuthStateChanged(auth, (user) => {
+        if (unsubscribeLogs) {
+            unsubscribeLogs();
+            unsubscribeLogs = null;
+        }
+
+        currentUser = user;
+        DOM.authLoadingScreen.classList.add('hidden');
+
+        if (user) {
+            // ログインゲートを隠し、アプリ本体とナビゲーションを表示
+            DOM.loginGateScreen.classList.add('hidden');
+            DOM.appMainContainer.classList.remove('hidden');
+            
+            DOM.desktopNav.classList.remove('hidden');
+            DOM.desktopNav.classList.add('sm:flex');
+            
+            DOM.mobileBottomNav.classList.remove('hidden');
+            DOM.mobileBottomNav.classList.add('flex', 'sm:hidden');
+
+            DOM.headerAuthArea.classList.remove('hidden');
+            DOM.headerAuthArea.classList.add('flex');
+            
+            DOM.userName.textContent = user.displayName || user.email || 'User';
+            if (user.photoURL) {
+                DOM.userAvatar.src = user.photoURL;
+                DOM.userAvatar.classList.remove('hidden');
+            } else {
+                DOM.userAvatar.classList.add('hidden');
+            }
+
+            // URLハッシュに #history が指定されていた場合の初期タブ反映
+            if (window.location.hash === '#history') {
+                switchTab('history');
+            } else {
+                switchTab('record');
+            }
+
+            const q = query(getUserLogsRef(user.uid), orderBy("createdAt", "desc"));
+            unsubscribeLogs = onSnapshot(q, (snapshot) => {
+                cloudLogs = [];
+                snapshot.forEach((docSnap) => {
+                    cloudLogs.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                updateBeansDatalist();
+                applyFiltersAndSort();
+            }, (error) => {
+                console.error("Snapshot error:", error);
+                showToast('データの同期に失敗しました', true);
+            });
+        } else {
+            // 未ログイン時：アプリ本体・ナビゲーション・データを完全に隠蔽しログインボタンのみ表示
+            cloudLogs = [];
+            filteredLogs = [];
+            DOM.logsContainer.innerHTML = '';
+
+            DOM.appMainContainer.classList.add('hidden');
+            DOM.desktopNav.classList.add('hidden');
+            DOM.desktopNav.classList.remove('sm:flex');
+            DOM.mobileBottomNav.classList.add('hidden');
+            DOM.mobileBottomNav.classList.remove('flex', 'sm:hidden');
+            DOM.headerAuthArea.classList.add('hidden');
+            DOM.headerAuthArea.classList.remove('flex');
+
+            DOM.loginGateScreen.classList.remove('hidden');
+        }
+    });
+
+    // 挽目・湯温のハイブリッド入力（数値直接入力 ＋ リスト選択の双方向同期）
+    function populateSelectOptions(selectEl, min, max, step, unit, defaultVal) {
+        let html = `<option value="">リスト選択</option>`;
+        for (let v = min; v <= max; v += step) {
+            const selected = Number(v) === Number(defaultVal) ? 'selected' : '';
+            html += `<option value="${v}" ${selected}>${v}${unit}</option>`;
+        }
+        selectEl.innerHTML = html;
+    }
+
+    function bindHybridInput(numberInput, selectInput) {
+        selectInput.addEventListener('change', () => {
+            if (selectInput.value !== '') {
+                numberInput.value = selectInput.value;
+            }
+        });
+        numberInput.addEventListener('input', () => {
+            const val = numberInput.value;
+            const matchOption = Array.from(selectInput.options).find(opt => opt.value === val);
+            selectInput.value = matchOption ? val : '';
+        });
+    }
+
+    populateSelectOptions(DOM.logGrindSelect, 8, 30, 1, ' click', DEFAULT_GRIND);
+    populateSelectOptions(DOM.logTempSelect, 75, 96, 1, '℃', DEFAULT_TEMP);
+    bindHybridInput(DOM.logGrind, DOM.logGrindSelect);
+    bindHybridInput(DOM.logTemp, DOM.logTempSelect);
+
+    // タブ切り替え（未ログイン時は実行をブロック）
     window.switchTab = function(tabId) {
+        if (!currentUser) return;
+
         const topActiveClass = "border-b-2 border-blue-400 text-blue-400 px-2 h-full flex items-center text-sm font-medium transition-colors";
         const topInactiveClass = "border-b-2 border-transparent text-slate-400 hover:text-slate-300 px-2 h-full flex items-center text-sm font-medium transition-colors";
         
@@ -349,6 +627,7 @@
         window.scrollTo(0, 0);
     };
 
+    // 4:6メソッド レシピ計算
     function calculateRecipe() {
         const amount = parseFloat(DOM.baseAmount.value) || 0;
         const isIce = DOM.isIceToggle.checked;
@@ -462,6 +741,20 @@
     DOM.baseAmount.addEventListener('input', calculateRecipe);
     DOM.isIceToggle.addEventListener('change', calculateRecipe);
 
+    function calcRatingSum(ratingsObj) {
+        if (!ratingsObj) return 0;
+        return RATING_KEYS.reduce((acc, item) => acc + (Number(ratingsObj[item.id]) || 0), 0);
+    }
+
+    function updateNewRatingSumDisplay() {
+        let sum = 0;
+        RATING_KEYS.forEach(item => {
+            const checked = document.querySelector(`input[name="new_${item.id}"]:checked`);
+            if (checked) sum += parseInt(checked.value, 10);
+        });
+        DOM.newRatingSum.textContent = sum;
+    }
+
     function generateRatingUI(prefix, defaultValues = {}) {
         return RATING_KEYS.map(item => {
             const val = defaultValues[item.id] || 3; 
@@ -475,16 +768,74 @@
         }).join('');
     }
     DOM.ratingContainer.innerHTML = generateRatingUI('new');
+    DOM.ratingContainer.addEventListener('change', updateNewRatingSumDisplay);
+    updateNewRatingSumDisplay();
 
-    const q = query(logsCollectionRef, orderBy("createdAt", "desc"));
-    onSnapshot(q, (snapshot) => {
-        cloudLogs = [];
-        snapshot.forEach((doc) => {
-            cloudLogs.push({ id: doc.id, ...doc.data() });
+    // 五角形レーダーチャートSVG生成
+    function renderPentagonRadarSVG(ratings = {}) {
+        const cx = 115;
+        const cy = 96;
+        const maxR = 54;
+        const levels = [1, 2, 3, 4, 5];
+
+        const getCoords = (index, value) => {
+            const angle = (-Math.PI / 2) + (index * 2 * Math.PI) / 5;
+            const r = (value / 5) * maxR;
+            return {
+                x: cx + r * Math.cos(angle),
+                y: cy + r * Math.sin(angle),
+                angle
+            };
+        };
+
+        const gridPolygons = levels.map(lvl => {
+            const pts = RATING_KEYS.map((_, i) => {
+                const c = getCoords(i, lvl);
+                return `${c.x.toFixed(1)},${c.y.toFixed(1)}`;
+            }).join(' ');
+            return `<polygon points="${pts}" fill="none" stroke="${lvl === 5 ? '#CBD5E1' : '#E2E8F0'}" stroke-width="1" />`;
+        }).join('');
+
+        const axisLines = RATING_KEYS.map((_, i) => {
+            const c = getCoords(i, 5);
+            return `<line x1="${cx}" y1="${cy}" x2="${c.x.toFixed(1)}" y2="${c.y.toFixed(1)}" stroke="#E2E8F0" stroke-width="1" />`;
+        }).join('');
+
+        const dataCoords = RATING_KEYS.map((item, i) => {
+            const val = Number(ratings[item.id]) || 0;
+            return getCoords(i, val);
         });
-        updateBeansDatalist();
-        applyFiltersAndSort();
-    });
+        const dataPointsStr = dataCoords.map(c => `${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' ');
+
+        const dataDots = dataCoords.map(c => 
+            `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="3" fill="#D97706" />`
+        ).join('');
+
+        const labels = RATING_KEYS.map((item, i) => {
+            const val = Number(ratings[item.id]) || 0;
+            const c = getCoords(i, 5);
+            const labelR = maxR + 16;
+            const lx = cx + labelR * Math.cos(c.angle);
+            const ly = cy + labelR * Math.sin(c.angle);
+            
+            let anchor = 'middle';
+            if (Math.cos(c.angle) > 0.25) anchor = 'start';
+            else if (Math.cos(c.angle) < -0.25) anchor = 'end';
+
+            const dy = Math.sin(c.angle) > 0.5 ? 8 : (Math.sin(c.angle) < -0.5 ? -2 : 3);
+            return `<text x="${lx.toFixed(1)}" y="${(ly + dy).toFixed(1)}" text-anchor="${anchor}" font-size="10" font-weight="600" fill="#475569">${item.label}(${val})</text>`;
+        }).join('');
+
+        return `
+            <svg viewBox="0 0 230 192" class="w-full max-w-[230px] h-auto mx-auto select-none">
+                ${gridPolygons}
+                ${axisLines}
+                <polygon points="${dataPointsStr}" fill="rgba(245, 158, 11, 0.25)" stroke="#F59E0B" stroke-width="2" stroke-linejoin="round" />
+                ${dataDots}
+                ${labels}
+            </svg>
+        `;
+    }
 
     function updateBeansDatalist() {
         const uniqueBeans = [...new Set(cloudLogs.map(log => log.beansName))];
@@ -502,19 +853,21 @@
     });
 
     function applyFiltersAndSort() {
+        if (!currentUser) return;
         const searchText = DOM.searchText.value.toLowerCase();
         const filterDrinkVal = DOM.filterDrink.value;
         const filterTempVal = DOM.filterTemp.value;
         const sortCriteriaVal = DOM.sortCriteria.value;
 
         filteredLogs = cloudLogs.filter(log => {
-            const matchText = log.beansName.toLowerCase().includes(searchText);
+            const matchText = (log.beansName || '').toLowerCase().includes(searchText);
             let matchDrink = true;
-            const logDrink = log.recipe.drinkType || 'black';
+            const logDrink = (log.recipe && log.recipe.drinkType) ? log.recipe.drinkType : 'black';
             if (filterDrinkVal !== 'all') matchDrink = logDrink === filterDrinkVal;
             let matchTemp = true;
-            if (filterTempVal === 'hot') matchTemp = !log.recipe.isIce;
-            if (filterTempVal === 'ice') matchTemp = log.recipe.isIce;
+            const isIce = log.recipe ? !!log.recipe.isIce : false;
+            if (filterTempVal === 'hot') matchTemp = !isIce;
+            if (filterTempVal === 'ice') matchTemp = isIce;
             return matchText && matchDrink && matchTemp;
         });
 
@@ -523,13 +876,20 @@
             if (sortCriteriaVal === 'date') {
                 valA = a.createdAt ? a.createdAt.toMillis() : 0;
                 valB = b.createdAt ? b.createdAt.toMillis() : 0;
+            } else if (sortCriteriaVal === 'overallScore') {
+                valA = (a.overallScore !== undefined && a.overallScore !== null && a.overallScore !== '') ? Number(a.overallScore) : -1;
+                valB = (b.overallScore !== undefined && b.overallScore !== null && b.overallScore !== '') ? Number(b.overallScore) : -1;
+            } else if (sortCriteriaVal === 'ratingSum') {
+                valA = calcRatingSum(a.ratings);
+                valB = calcRatingSum(b.ratings);
             } else {
-                valA = a.ratings[sortCriteriaVal] || 0;
-                valB = b.ratings[sortCriteriaVal] || 0;
+                valA = (a.ratings && a.ratings[sortCriteriaVal]) || 0;
+                valB = (b.ratings && b.ratings[sortCriteriaVal]) || 0;
             }
             return (valB - valA) * (sortOrder === 'desc' ? 1 : -1);
         });
 
+        DOM.logCountBadge.textContent = `${filteredLogs.length}件`;
         renderLogs();
     }
 
@@ -540,6 +900,11 @@
 
     DOM.logForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (!currentUser) {
+            showToast('ログインしてから保存してください', true);
+            return;
+        }
+
         DOM.btnSubmit.disabled = true;
         DOM.btnSubmit.textContent = '保存中...';
 
@@ -547,30 +912,38 @@
         RATING_KEYS.forEach(item => {
             ratings[item.id] = parseInt(document.querySelector(`input[name="new_${item.id}"]:checked`).value, 10);
         });
+        const ratingSum = calcRatingSum(ratings);
 
-        let logDateObj;
-        if (DOM.logDatetime.value) {
-            logDateObj = new Date(DOM.logDatetime.value);
-        } else {
-            logDateObj = new Date();
-        }
+        const rawOverall = DOM.logOverallScore.value.trim();
+        const overallScore = rawOverall !== '' ? Number(rawOverall) : null;
+
+        let logDateObj = DOM.logDatetime.value ? new Date(DOM.logDatetime.value) : new Date();
         const firestoreTimestamp = Timestamp.fromDate(logDateObj);
 
         const newLogData = {
             beansName: document.getElementById('log-beans-name').value,
-            grind: document.getElementById('log-grind').value,
-            temp: document.getElementById('log-temp').value,
+            grind: DOM.logGrind.value,
+            temp: DOM.logTemp.value,
             notes: DOM.logNotes.value,
             ratings: ratings,
+            ratingSum: ratingSum,
+            overallScore: overallScore,
             recipe: currentRecipe,
             createdAt: firestoreTimestamp
         };
 
         try {
-            await addDoc(logsCollectionRef, newLogData);
+            await addDoc(getUserLogsRef(currentUser.uid), newLogData);
             showToast('クラウドに記録を保存しました！');
             DOM.logForm.reset();
+            
+            DOM.logGrind.value = DEFAULT_GRIND;
+            DOM.logGrindSelect.value = String(DEFAULT_GRIND);
+            DOM.logTemp.value = DEFAULT_TEMP;
+            DOM.logTempSelect.value = String(DEFAULT_TEMP);
+
             DOM.ratingContainer.innerHTML = generateRatingUI('new');
+            updateNewRatingSumDisplay();
             updateFlavorUI('normal');
             updateDrinkUI('black');
             switchTab('history');
@@ -583,7 +956,6 @@
         }
     });
 
-    // FirestoreのTimestampを datetime-local 向け(YYYY-MM-DDThh:mm)に変換する関数
     function formatDateForInput(timestamp) {
         if (!timestamp) return '';
         const d = timestamp.toDate();
@@ -591,7 +963,17 @@
         return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
     }
 
+    function buildSelectOptionsHtml(min, max, unit, currentVal) {
+        let html = `<option value="">選択</option>`;
+        for (let v = min; v <= max; v++) {
+            const selected = Number(v) === Number(currentVal) ? 'selected' : '';
+            html += `<option value="${v}" ${selected}>${v}${unit}</option>`;
+        }
+        return html;
+    }
+
     function renderLogs() {
+        if (!currentUser) return;
         if (filteredLogs.length === 0) {
             DOM.logsContainer.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10 border-2 border-dashed border-gray-200 rounded-xl">条件に一致する記録がありません。</div>`;
             return;
@@ -600,60 +982,73 @@
         DOM.logsContainer.innerHTML = filteredLogs.map(log => {
             const logDate = log.createdAt ? log.createdAt.toDate() : new Date();
             const dateStr = logDate.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
+            const recipe = log.recipe || { drinkType: 'black', beans: 0, isIce: false, flavor: 'normal', milkAmount: 0 };
             
-            const tempBadge = log.recipe.isIce 
+            const tempBadge = recipe.isIce 
                 ? '<span class="bg-blue-100 text-blue-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Ice</span>'
                 : '<span class="bg-orange-100 text-orange-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Hot</span>';
             
-            const isLatte = log.recipe.drinkType === 'latte';
+            const isLatte = recipe.drinkType === 'latte';
             const drinkBadge = isLatte
                 ? '<span class="bg-stone-200 text-stone-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Latte</span>'
                 : '<span class="bg-slate-200 text-slate-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Black</span>';
 
             const flavorLabels = { sweet: '甘味', normal: '通常', acidic: '酸味' };
-            const flavorName = log.recipe.flavor ? flavorLabels[log.recipe.flavor] : '通常';
+            const flavorName = recipe.flavor ? (flavorLabels[recipe.flavor] || '通常') : '通常';
 
-            const displayRatings = RATING_KEYS.map(item => `
-                <div class="flex justify-between items-center text-sm">
-                    <span class="text-gray-500">${item.label}</span>
-                    <div class="flex gap-0.5">
-                        ${Array(5).fill(0).map((_, i) => `
-                            <svg class="w-3.5 h-3.5 ${i < log.ratings[item.id] ? 'text-yellow-400' : 'text-gray-200'}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('');
+            const ratingSum = calcRatingSum(log.ratings);
+            const hasOverall = log.overallScore !== undefined && log.overallScore !== null && log.overallScore !== '';
+            const overallDisplay = hasOverall ? `${log.overallScore}<span class="text-xs font-normal text-slate-300"> / 100点</span>` : `<span class="text-xs font-normal text-slate-400">未入力</span>`;
 
-            const notesHtml = log.notes ? `<div class="mt-2.5 p-2 bg-yellow-50 text-gray-700 text-xs rounded border border-yellow-100 leading-tight"><svg class="w-3.5 h-3.5 inline-block text-yellow-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>${log.notes.replace(/\n/g, '<br>')}</div>` : '';
-            const detailMilk = isLatte ? `<div><span class="block text-[10px] text-gray-400">ミルク</span>${log.recipe.milkAmount}ml</div>` : '';
+            const radarSvg = renderPentagonRadarSVG(log.ratings);
+
+            const notesHtml = log.notes ? `<div class="mt-2.5 p-2 bg-yellow-50 text-gray-700 text-xs rounded border border-yellow-100 leading-tight"><svg class="w-3.5 h-3.5 inline-block text-yellow-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>${String(log.notes).replace(/
+/g, '<br>')}</div>` : '';
+            const detailMilk = isLatte ? `<div><span class="block text-[10px] text-gray-400">ミルク</span>${recipe.milkAmount}ml</div>` : '';
 
             return `
                 <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow h-fit relative">
                     
                     <!-- 表示モード -->
                     <div id="display-mode-${log.id}">
-                        <div class="flex flex-col gap-1 mb-3 pb-2 border-b border-gray-50">
-                            <h3 class="font-bold text-gray-800 text-sm leading-tight pr-8">${log.beansName}</h3>
+                        <div class="flex flex-col gap-1 mb-3 pb-2 border-b border-gray-100">
+                            <h3 class="font-bold text-gray-800 text-sm leading-tight">${log.beansName}</h3>
                             <div class="flex items-center justify-between mt-1">
                                 <div class="flex gap-1">${drinkBadge}${tempBadge}</div>
                                 <span class="text-[10px] text-gray-400">${dateStr}</span>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-y-2.5 gap-x-2 text-xs text-gray-600 mb-3 bg-gray-50 p-2.5 rounded">
-                            <div><span class="block text-[10px] text-gray-400">豆量</span>${log.recipe.beans}g</div>
+
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <div class="bg-slate-800 text-white rounded-lg px-3 py-2 text-center">
+                                <span class="block text-[10px] text-slate-300">総合点</span>
+                                <span class="text-base font-bold">${overallDisplay}</span>
+                            </div>
+                            <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg px-3 py-2 text-center">
+                                <span class="block text-[10px] text-amber-700">5項目合計</span>
+                                <span class="text-base font-bold">${ratingSum}<span class="text-xs font-normal text-amber-700"> / 25点</span></span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-y-2 gap-x-2 text-xs text-gray-600 mb-3 bg-gray-50 p-2.5 rounded">
+                            <div><span class="block text-[10px] text-gray-400">豆量</span>${recipe.beans}g</div>
                             <div><span class="block text-[10px] text-gray-400">傾向</span>${flavorName}</div>
                             <div><span class="block text-[10px] text-gray-400">湯温</span>${log.temp}℃</div>
                             <div><span class="block text-[10px] text-gray-400">挽目</span>${log.grind}</div>
                             ${isLatte ? detailMilk : ''}
                         </div>
-                        <div class="space-y-1 mb-2">${displayRatings}</div>
+
+                        <div class="bg-slate-50/70 rounded-xl py-1 px-2 border border-slate-100 mb-2">
+                            ${radarSvg}
+                        </div>
+
                         ${notesHtml}
                         <div class="flex justify-end mt-3 border-t pt-3">
                             <button onclick="window.toggleEditMode('${log.id}', true)" class="text-xs px-2.5 py-1 text-slate-600 border border-slate-300 rounded hover:bg-slate-50 transition-colors">記録を編集する</button>
                         </div>
                     </div>
 
-                    <!-- 編集モード（フルフォーム） -->
+                    <!-- 編集モード -->
                     <div id="edit-mode-${log.id}" class="hidden">
                         <p class="text-sm font-bold text-gray-700 mb-3 border-b pb-2">記録を編集</p>
                         <div class="space-y-3">
@@ -668,12 +1063,26 @@
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="block text-[10px] text-gray-500 mb-1">挽目 (C3)</label>
-                                    <input type="number" id="edit-grind-${log.id}" value="${log.grind}" class="w-full text-xs rounded border-gray-300 px-2 py-1.5 border">
+                                    <div class="flex gap-1">
+                                        <input type="number" id="edit-grind-${log.id}" value="${log.grind}" step="0.5" inputmode="decimal" class="w-1/2 text-xs rounded border-gray-300 px-1.5 py-1.5 border">
+                                        <select onchange="document.getElementById('edit-grind-${log.id}').value=this.value" class="w-1/2 text-[11px] rounded border-gray-300 px-1 py-1.5 border bg-white">
+                                            ${buildSelectOptionsHtml(8, 30, '', log.grind)}
+                                        </select>
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="block text-[10px] text-gray-500 mb-1">湯温 (℃)</label>
-                                    <input type="number" id="edit-temp-${log.id}" value="${log.temp}" class="w-full text-xs rounded border-gray-300 px-2 py-1.5 border">
+                                    <div class="flex gap-1">
+                                        <input type="number" id="edit-temp-${log.id}" value="${log.temp}" step="0.5" inputmode="decimal" class="w-1/2 text-xs rounded border-gray-300 px-1.5 py-1.5 border">
+                                        <select onchange="document.getElementById('edit-temp-${log.id}').value=this.value" class="w-1/2 text-[11px] rounded border-gray-300 px-1 py-1.5 border bg-white">
+                                            ${buildSelectOptionsHtml(75, 96, '℃', log.temp)}
+                                        </select>
+                                    </div>
                                 </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-gray-500 mb-1">総合点 (100点満点)</label>
+                                <input type="number" id="edit-overall-${log.id}" value="${hasOverall ? log.overallScore : ''}" min="0" max="100" step="1" placeholder="未入力" class="w-full text-xs rounded border-gray-300 px-2 py-1.5 border">
                             </div>
                             <div>
                                 <label class="block text-[10px] text-gray-500 mb-1">評価</label>
@@ -685,9 +1094,12 @@
                                 <label class="block text-[10px] text-gray-500 mb-1">メモ</label>
                                 <textarea id="edit-notes-${log.id}" rows="2" class="w-full text-xs rounded border-gray-300 px-2 py-1.5 border">${log.notes || ''}</textarea>
                             </div>
-                            <div class="flex justify-end gap-2 mt-4 pt-3 border-t border-gray-100">
-                                <button onclick="window.toggleEditMode('${log.id}', false)" class="text-xs px-3 py-1.5 text-slate-600 bg-white border border-slate-300 rounded hover:bg-slate-50 transition-colors">キャンセル</button>
-                                <button onclick="window.saveEdit('${log.id}')" class="text-xs px-3 py-1.5 bg-slate-800 text-white rounded hover:bg-slate-700 transition-colors">更新して保存</button>
+                            <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-100">
+                                <button onclick="window.deleteLog('${log.id}')" class="text-xs px-2.5 py-1.5 text-red-600 hover:bg-red-50 rounded transition-colors">削除</button>
+                                <div class="flex gap-2">
+                                    <button onclick="window.toggleEditMode('${log.id}', false)" class="text-xs px-3 py-1.5 text-slate-600 bg-white border border-slate-300 rounded hover:bg-slate-50 transition-colors">キャンセル</button>
+                                    <button onclick="window.saveEdit('${log.id}')" class="text-xs px-3 py-1.5 bg-slate-800 text-white rounded hover:bg-slate-700 transition-colors">更新して保存</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -697,6 +1109,7 @@
     }
 
     window.toggleEditMode = function(id, isEdit) {
+        if (!currentUser) return;
         if (isEdit) {
             document.getElementById(`display-mode-${id}`).classList.add('hidden');
             document.getElementById(`edit-mode-${id}`).classList.remove('hidden');
@@ -707,17 +1120,18 @@
     };
 
     window.saveEdit = async function(id) {
+        if (!currentUser) return;
         const targetLog = cloudLogs.find(log => log.id === id);
-        if(targetLog) {
+        if (targetLog) {
             const updatedRatings = {};
             RATING_KEYS.forEach(item => {
                 const checked = document.querySelector(`input[name="edit_${id}_${item.id}"]:checked`);
-                if(checked) updatedRatings[item.id] = parseInt(checked.value, 10);
+                if (checked) updatedRatings[item.id] = parseInt(checked.value, 10);
             });
 
-            // 新しい日時の取得（空の場合は元の時刻を維持）
             const newDatetimeVal = document.getElementById(`edit-datetime-${id}`).value;
             const newTimestamp = newDatetimeVal ? Timestamp.fromDate(new Date(newDatetimeVal)) : targetLog.createdAt;
+            const rawOverall = document.getElementById(`edit-overall-${id}`).value.trim();
 
             const updatedData = {
                 beansName: document.getElementById(`edit-beans-${id}`).value,
@@ -725,11 +1139,13 @@
                 temp: document.getElementById(`edit-temp-${id}`).value,
                 notes: document.getElementById(`edit-notes-${id}`).value,
                 ratings: updatedRatings,
+                ratingSum: calcRatingSum(updatedRatings),
+                overallScore: rawOverall !== '' ? Number(rawOverall) : null,
                 createdAt: newTimestamp
             };
 
             try {
-                const logDocRef = doc(db, 'coffeeLogs', id);
+                const logDocRef = doc(db, 'users', currentUser.uid, 'coffeeLogs', id);
                 await updateDoc(logDocRef, updatedData);
                 showToast('記録を更新しました');
             } catch (error) {
@@ -738,6 +1154,227 @@
             }
         }
     };
+
+    window.deleteLog = async function(id) {
+        if (!currentUser) return;
+        if (!confirm('この抽出記録を削除しますか？')) return;
+        try {
+            await deleteDoc(doc(db, 'users', currentUser.uid, 'coffeeLogs', id));
+            showToast('記録を削除しました');
+        } catch (error) {
+            console.error("Error deleting document: ", error);
+            showToast('削除に失敗しました', true);
+        }
+    };
+
+    function escapeCsvField(val) {
+        if (val === null || val === undefined) return '';
+        const str = String(val);
+        if (str.includes('"') || str.includes(',') || str.includes('\n') || str.includes('\r')) {
+            return `"${str.replace(/"/g, '""')}"`;
+        }
+        return str;
+    }
+
+    DOM.btnExportCsv.addEventListener('click', () => {
+        if (!currentUser) return;
+        if (cloudLogs.length === 0) {
+            showToast('エクスポートするデータがありません', true);
+            return;
+        }
+
+        const headers = [
+            '抽出日時', '豆の名前', 'ドリンク種類', 'アイス', '味調整',
+            '豆量_g', '総量_ml', 'お湯_ml', 'ミルク_ml', '氷_g',
+            '挽目', '湯温', '酸味', '甘み', '苦み', 'ボディ', '後味',
+            '5項目合計', '総合点_100点満点', 'メモ'
+        ];
+
+        const rows = cloudLogs.map(log => {
+            const dt = log.createdAt ? log.createdAt.toDate().toISOString() : '';
+            const r = log.recipe || {};
+            const rt = log.ratings || {};
+            return [
+                dt,
+                log.beansName || '',
+                r.drinkType || 'black',
+                r.isIce ? 'true' : 'false',
+                r.flavor || 'normal',
+                r.beans ?? '',
+                r.totalYield ?? '',
+                r.hotWaterAmount ?? '',
+                r.milkAmount ?? 0,
+                r.iceAmount ?? 0,
+                log.grind ?? '',
+                log.temp ?? '',
+                rt.acidity ?? 3,
+                rt.sweetness ?? 3,
+                rt.bitterness ?? 3,
+                rt.body ?? 3,
+                rt.aftertaste ?? 3,
+                calcRatingSum(rt),
+                log.overallScore ?? '',
+                log.notes || ''
+            ].map(escapeCsvField).join(',');
+        });
+
+        const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const todayStr = new Date().toISOString().slice(0, 10);
+        a.href = url;
+        a.download = `coffee-drip-log_${todayStr}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast(`${cloudLogs.length}件のCSVをエクスポートしました`);
+    });
+
+    function parseCsvText(text) {
+        const cleanText = text.replace(/^\uFEFF/, '');
+        const rows = [];
+        let row = [];
+        let field = '';
+        let inQuotes = false;
+
+        for (let i = 0; i < cleanText.length; i++) {
+            const char = cleanText[i];
+            const nextChar = cleanText[i + 1];
+
+            if (inQuotes) {
+                if (char === '"' && nextChar === '"') {
+                    field += '"';
+                    i++;
+                } else if (char === '"') {
+                    inQuotes = false;
+                } else {
+                    field += char;
+                }
+            } else {
+                if (char === '"') {
+                    inQuotes = true;
+                } else if (char === ',') {
+                    row.push(field);
+                    field = '';
+                } else if (char === '\r' && nextChar === '\n') {
+                    row.push(field);
+                    rows.push(row);
+                    row = [];
+                    field = '';
+                    i++;
+                } else if (char === '\n' || char === '\r') {
+                    row.push(field);
+                    rows.push(row);
+                    row = [];
+                    field = '';
+                } else {
+                    field += char;
+                }
+            }
+        }
+        if (field !== '' || row.length > 0) {
+            row.push(field);
+            rows.push(row);
+        }
+        return rows.filter(r => r.some(cell => cell.trim() !== ''));
+    }
+
+    DOM.btnImportCsv.addEventListener('click', () => {
+        if (!currentUser) return;
+        DOM.csvFileInput.value = '';
+        DOM.csvFileInput.click();
+    });
+
+    DOM.csvFileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file || !currentUser) return;
+
+        const mode = document.querySelector('input[name="csv-import-mode"]:checked').value;
+
+        try {
+            const text = await file.text();
+            const parsedRows = parseCsvText(text);
+            if (parsedRows.length < 2) {
+                showToast('CSVにデータ行がありません', true);
+                return;
+            }
+
+            const header = parsedRows[0].map(h => h.trim());
+            const dataRows = parsedRows.slice(1);
+            const idx = (name, fallbackIdx) => {
+                const found = header.indexOf(name);
+                return found !== -1 ? found : fallbackIdx;
+            };
+
+            const recordsToImport = dataRows.map(cols => {
+                const dtStr = cols[idx('抽出日時', 0)];
+                const parsedDate = dtStr ? new Date(dtStr) : new Date();
+                const validDate = isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
+
+                const ratings = {
+                    acidity: Number(cols[idx('酸味', 12)]) || 3,
+                    sweetness: Number(cols[idx('甘み', 13)]) || 3,
+                    bitterness: Number(cols[idx('苦み', 14)]) || 3,
+                    body: Number(cols[idx('ボディ', 15)]) || 3,
+                    aftertaste: Number(cols[idx('後味', 16)]) || 3
+                };
+
+                const rawOverall = (cols[idx('総合点_100点満点', 18)] ?? '').trim();
+                const overallScore = rawOverall !== '' && !isNaN(Number(rawOverall)) ? Number(rawOverall) : null;
+
+                return {
+                    beansName: cols[idx('豆の名前', 1)] || '名称未設定',
+                    grind: cols[idx('挽目', 10)] || String(DEFAULT_GRIND),
+                    temp: cols[idx('湯温', 11)] || String(DEFAULT_TEMP),
+                    notes: cols[idx('メモ', 19)] || '',
+                    ratings: ratings,
+                    ratingSum: calcRatingSum(ratings),
+                    overallScore: overallScore,
+                    recipe: {
+                        drinkType: cols[idx('ドリンク種類', 2)] || 'black',
+                        isIce: String(cols[idx('アイス', 3)]).toLowerCase() === 'true',
+                        flavor: cols[idx('味調整', 4)] || 'normal',
+                        beans: Number(cols[idx('豆量_g', 5)]) || 15,
+                        totalYield: Number(cols[idx('総量_ml', 6)]) || 225,
+                        hotWaterAmount: Number(cols[idx('お湯_ml', 7)]) || 225,
+                        milkAmount: Number(cols[idx('ミルク_ml', 8)]) || 0,
+                        iceAmount: Number(cols[idx('氷_g', 9)]) || 0
+                    },
+                    createdAt: Timestamp.fromDate(validDate)
+                };
+            });
+
+            if (mode === 'overwrite') {
+                const ok = confirm(`【上書き変更の確認】\n現在保存されている履歴をすべて削除し、CSVの ${recordsToImport.length} 件で置き換えます。よろしいですか？`);
+                if (!ok) return;
+
+                const existingSnap = await getDocs(getUserLogsRef(currentUser.uid));
+                const existingDocs = existingSnap.docs;
+                for (let i = 0; i < existingDocs.length; i += 450) {
+                    const batch = writeBatch(db);
+                    existingDocs.slice(i, i + 450).forEach(d => batch.delete(d.ref));
+                    await batch.commit();
+                }
+            }
+
+            const userLogsRef = getUserLogsRef(currentUser.uid);
+            for (let i = 0; i < recordsToImport.length; i += 450) {
+                const batch = writeBatch(db);
+                recordsToImport.slice(i, i + 450).forEach(rec => {
+                    const newDocRef = doc(userLogsRef);
+                    batch.set(newDocRef, rec);
+                });
+                await batch.commit();
+            }
+
+            showToast(`${recordsToImport.length}件を${mode === 'overwrite' ? '上書き' : '追記'}インポートしました`);
+        } catch (error) {
+            console.error('CSV import error:', error);
+            showToast('CSVのインポートに失敗しました', true);
+        }
+    });
 
     function showToast(message, isError = false) {
         const toast = document.createElement('div');
