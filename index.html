@@ -27,27 +27,29 @@
 <body class="text-gray-800 antialiased min-h-screen pb-24 sm:pb-8">
 
 <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40">
-    <div class="max-w-5xl mx-auto px-4 flex justify-between items-center h-16">
-        <div class="flex items-center gap-6 h-full">
-            <h1 class="text-lg font-bold flex items-center gap-1.5">
+    <div class="max-w-6xl mx-auto px-4 flex justify-between items-center h-16">
+        <div class="flex items-center gap-6 h-full min-w-0">
+            <h1 class="text-lg font-bold flex items-center gap-1.5 shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 BrewLog <span class="text-xs text-blue-300 font-normal mt-0.5">4:6</span>
             </h1>
-            <nav id="desktop-nav" class="hidden space-x-4 h-full pt-1" aria-label="Tabs">
-                <button onclick="switchTab('record')" id="tab-btn-record" class="border-b-2 border-blue-400 text-blue-400 px-2 h-full flex items-center text-sm font-medium transition-colors">記録する</button>
-                <button onclick="switchTab('history')" id="tab-btn-history" class="border-b-2 border-transparent text-slate-400 hover:text-slate-300 px-2 h-full flex items-center text-sm font-medium transition-colors">履歴・検索</button>
+            <!-- PC・タブレット幅(sm以上)のみ表示するヘッダータブ -->
+            <nav id="desktop-nav" class="hidden space-x-3 h-full pt-1" aria-label="Tabs">
+                <button onclick="switchTab('record')" id="tab-btn-record" class="border-b-2 border-blue-400 text-blue-400 px-2 h-full flex items-center text-sm font-medium transition-colors whitespace-nowrap">記録する</button>
+                <button onclick="switchTab('history')" id="tab-btn-history" class="border-b-2 border-transparent text-slate-400 hover:text-slate-300 px-2 h-full flex items-center text-sm font-medium transition-colors whitespace-nowrap">履歴・検索</button>
+                <button onclick="switchTab('stats')" id="tab-btn-stats" class="border-b-2 border-transparent text-slate-400 hover:text-slate-300 px-2 h-full flex items-center text-sm font-medium transition-colors whitespace-nowrap">統計</button>
             </nav>
         </div>
 
-        <div id="header-auth-area" class="hidden items-center gap-3">
+        <div id="header-auth-area" class="hidden items-center gap-2.5 shrink-0">
             <div class="text-xs text-green-400 font-semibold flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                <span class="hidden sm:inline">Cloud Sync</span>
+                <span class="hidden lg:inline">Cloud Sync</span>
             </div>
             <div class="flex items-center gap-2">
                 <img id="user-avatar" src="" alt="User" class="w-7 h-7 rounded-full border border-slate-600 hidden">
-                <span id="user-name" class="text-xs text-slate-300 hidden md:inline max-w-[140px] truncate"></span>
-                <button type="button" id="btn-logout" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded border border-slate-700 transition-colors">
+                <span id="user-name" class="text-xs text-slate-300 hidden md:inline max-w-[130px] truncate"></span>
+                <button type="button" id="btn-logout" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded border border-slate-700 transition-colors whitespace-nowrap">
                     ログアウト
                 </button>
             </div>
@@ -79,9 +81,9 @@
 </div>
 
 <!-- アプリ本体 -->
-<main id="app-main-container" class="hidden max-w-5xl mx-auto px-4 py-6">
+<main id="app-main-container" class="hidden max-w-6xl mx-auto px-4 py-6">
     
-    <!-- タブ1：計算＆登録フォーム -->
+    <!-- ==================== タブ1：計算＆登録フォーム ==================== -->
     <section id="tab-content-record" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100 h-fit">
@@ -174,13 +176,49 @@
                     <input type="text" id="log-beans-name" list="beans-list" placeholder="例: 澤井珈琲 エチオピア" required class="w-full rounded-md border-gray-300 shadow-sm px-4 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm">
                     <datalist id="beans-list"></datalist>
                 </div>
-                
+
+                <!-- 状態（豆／粉）と焙煎度合い -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">挽目 (C3)</label>
-                        <div class="flex gap-1.5">
-                            <input type="number" id="log-grind" value="18" step="0.5" min="1" max="50" inputmode="decimal" required class="w-1/2 rounded-md border-gray-300 shadow-sm px-3 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm font-semibold">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">購入時の状態</label>
+                        <div class="flex rounded-md shadow-sm" role="group">
+                            <button type="button" id="btn-form-beans" class="flex-1 px-3 py-2 text-sm font-medium rounded-l-lg border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors">豆</button>
+                            <button type="button" id="btn-form-powder" class="flex-1 px-3 py-2 text-sm font-medium rounded-r-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors">粉</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="log-roast" class="block text-sm font-medium text-gray-700 mb-1">焙煎度合い</label>
+                        <select id="log-roast" class="w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border bg-white focus:ring-slate-500 focus:border-slate-500 text-sm text-gray-700">
+                            <option value="">未選択</option>
+                            <option value="極浅煎り">極浅煎り</option>
+                            <option value="浅煎り">浅煎り</option>
+                            <option value="中煎り">中煎り</option>
+                            <option value="中深煎り">中深煎り</option>
+                            <option value="深煎り">深煎り</option>
+                            <option value="極深煎り">極深煎り</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 挽目（豆：C3クリック / 粉：粒度選択）＆ 湯温 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label id="log-grind-label" class="block text-sm font-medium text-gray-700 mb-1">挽目 (C3)</label>
+                        <!-- 豆選択時のUI -->
+                        <div id="grind-beans-wrapper" class="flex gap-1.5">
+                            <input type="number" id="log-grind" value="18" step="0.5" min="1" max="50" inputmode="decimal" class="w-1/2 rounded-md border-gray-300 shadow-sm px-3 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm font-semibold">
                             <select id="log-grind-select" aria-label="挽目リスト選択" class="w-1/2 rounded-md border-gray-300 shadow-sm px-2 py-2 border bg-white focus:ring-slate-500 focus:border-slate-500 text-sm text-gray-700"></select>
+                        </div>
+                        <!-- 粉選択時のUI -->
+                        <div id="grind-powder-wrapper" class="hidden">
+                            <select id="log-grind-powder" aria-label="粉の挽目選択" class="w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border bg-white focus:ring-slate-500 focus:border-slate-500 text-sm font-medium text-gray-800">
+                                <option value="粗挽き">粗挽き</option>
+                                <option value="中粗挽き">中粗挽き</option>
+                                <option value="中挽き" selected>中挽き</option>
+                                <option value="中細挽き">中細挽き</option>
+                                <option value="細挽き">細挽き</option>
+                                <option value="極細挽き">極細挽き</option>
+                            </select>
                         </div>
                     </div>
                     <div>
@@ -188,6 +226,21 @@
                         <div class="flex gap-1.5">
                             <input type="number" id="log-temp" value="83" step="0.5" min="40" max="100" inputmode="decimal" required class="w-1/2 rounded-md border-gray-300 shadow-sm px-3 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm font-semibold">
                             <select id="log-temp-select" aria-label="湯温リスト選択" class="w-1/2 rounded-md border-gray-300 shadow-sm px-2 py-2 border bg-white focus:ring-slate-500 focus:border-slate-500 text-sm text-gray-700"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 抽出時間 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">抽出にかかった時間 (オプション)</label>
+                    <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-1.5 flex-1">
+                            <input type="number" id="log-time-min" min="0" max="59" step="1" placeholder="2" inputmode="numeric" class="w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm text-right">
+                            <span class="text-sm text-gray-600 shrink-0">分</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 flex-1">
+                            <input type="number" id="log-time-sec" min="0" max="59" step="1" placeholder="30" inputmode="numeric" class="w-full rounded-md border-gray-300 shadow-sm px-3 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm text-right">
+                            <span class="text-sm text-gray-600 shrink-0">秒</span>
                         </div>
                     </div>
                 </div>
@@ -227,15 +280,15 @@
         </div>
     </section>
 
-    <!-- タブ2：ログ履歴・検索 -->
+    <!-- ==================== タブ2：ログ履歴・検索 ==================== -->
     <section id="tab-content-history" class="tab-hidden">
         <!-- 検索・絞り込み・ソート -->
-        <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100 mb-5">
+        <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100 mb-3">
             <div class="flex items-center gap-2 mb-4 text-gray-600 font-semibold border-b pb-2 text-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 検索・絞り込み・並び替え
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 mb-1">豆の名前で検索</label>
                     <input type="text" id="search-text" placeholder="キーワード入力..." class="w-full rounded border-gray-300 shadow-sm px-3 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm">
@@ -257,11 +310,24 @@
                     </select>
                 </div>
                 <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">焙煎度合い</label>
+                    <select id="filter-roast" class="w-full rounded border-gray-300 shadow-sm px-3 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm bg-white">
+                        <option value="all">すべて</option>
+                        <option value="極浅煎り">極浅煎り</option>
+                        <option value="浅煎り">浅煎り</option>
+                        <option value="中煎り">中煎り</option>
+                        <option value="中深煎り">中深煎り</option>
+                        <option value="深煎り">深煎り</option>
+                        <option value="極深煎り">極深煎り</option>
+                    </select>
+                </div>
+                <div>
                     <label class="block text-xs font-bold text-gray-500 mb-1">並び替え基準</label>
                     <select id="sort-criteria" class="w-full rounded border-gray-300 shadow-sm px-3 py-2 border focus:ring-slate-500 focus:border-slate-500 text-sm bg-white">
                         <option value="date">抽出日時</option>
                         <option value="overallScore">総合点 (100点満点)</option>
                         <option value="ratingSum">5項目合計点</option>
+                        <option value="brewTime">抽出時間</option>
                         <option value="sweetness">甘み評価</option>
                         <option value="acidity">酸味評価</option>
                         <option value="bitterness">苦み評価</option>
@@ -272,28 +338,16 @@
                 <div>
                     <label class="block text-xs font-bold text-gray-500 mb-1">順序</label>
                     <button type="button" id="btn-sort-order" class="w-full bg-white border border-gray-300 rounded shadow-sm px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none flex justify-between items-center transition-colors">
-                        <span>降順 (新しい/高い順)</span>
-                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <span class="truncate">降順 (新/高)</span>
+                        <svg class="w-4 h-4 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- ログ一覧 -->
-        <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100 min-h-[400px]">
-            <div class="flex items-center justify-between mb-4 border-b pb-2">
-                <div class="flex items-center gap-2 text-gray-600 font-semibold text-sm">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
-                    ログ一覧
-                </div>
-                <span id="log-count-badge" class="text-xs text-gray-500">0件</span>
-            </div>
-            <div id="logs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
-        </div>
-
-        <!-- CSVバックアップ・インポート（控えめなユーティリティバー） -->
-        <div class="mt-6 bg-white/60 rounded-xl px-4 py-3 border border-gray-200/80">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <!-- CSVバックアップ・インポート（検索カードの直下に控えめデザインで配置） -->
+        <div class="mb-5 bg-white/60 rounded-xl px-4 py-2.5 border border-gray-200/80">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2.5">
                 <div class="flex items-center gap-1.5 text-gray-500 font-medium text-xs">
                     <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
                     <span>CSVバックアップ・インポート</span>
@@ -324,18 +378,168 @@
                 </div>
             </div>
         </div>
+
+        <!-- ログ一覧 -->
+        <div class="glass-panel rounded-2xl shadow-sm p-4 sm:p-5 border border-gray-100 min-h-[400px]">
+            <!-- 一覧ヘッダー・表示切替コントロールバー -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b pb-3">
+                <div class="flex items-center gap-2 text-gray-600 font-semibold text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                    <span>ログ一覧</span>
+                    <span id="log-count-badge" class="text-xs font-normal bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">0件</span>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 text-xs">
+                    <!-- グリッド / リスト切替 -->
+                    <div class="inline-flex rounded-lg border border-gray-300 bg-white p-0.5 shadow-sm" role="group">
+                        <button type="button" id="btn-view-grid" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md font-medium bg-slate-800 text-white transition-colors" title="グリッド表示">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                            <span>グリッド</span>
+                        </button>
+                        <button type="button" id="btn-view-list" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md font-medium text-gray-600 hover:bg-gray-100 transition-colors" title="リスト表示">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                            <span>リスト</span>
+                        </button>
+                    </div>
+
+                    <!-- グリッド列数選択（1〜5列） -->
+                    <div id="grid-cols-control" class="inline-flex items-center gap-1 bg-white border border-gray-300 rounded-lg px-2 py-1 shadow-sm">
+                        <label for="select-grid-cols" class="text-gray-500 font-medium">横列:</label>
+                        <select id="select-grid-cols" class="bg-transparent font-semibold text-slate-800 focus:outline-none cursor-pointer">
+                            <option value="1">1列</option>
+                            <option value="2">2列</option>
+                            <option value="3" selected>3列</option>
+                            <option value="4">4列</option>
+                            <option value="5">5列</option>
+                        </select>
+                    </div>
+
+                    <!-- 1ページ表示件数（10〜50件、10刻み、初期値10） -->
+                    <div class="inline-flex items-center gap-1 bg-white border border-gray-300 rounded-lg px-2 py-1 shadow-sm">
+                        <label for="select-page-size" class="text-gray-500 font-medium">表示:</label>
+                        <select id="select-page-size" class="bg-transparent font-semibold text-slate-800 focus:outline-none cursor-pointer">
+                            <option value="10" selected>10件</option>
+                            <option value="20">20件</option>
+                            <option value="30">30件</option>
+                            <option value="40">40件</option>
+                            <option value="50">50件</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ログ本体コンテナ -->
+            <div id="logs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+            <!-- ページネーションコントロール -->
+            <div id="pagination-container" class="mt-6 pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-600">
+                <div id="pagination-info">0件中 0〜0件を表示</div>
+                <div id="pagination-buttons" class="flex items-center gap-1.5"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== タブ3：統計ダッシュボード ==================== -->
+    <section id="tab-content-stats" class="tab-hidden space-y-6">
+        <!-- 統計フィルタバー -->
+        <div class="glass-panel rounded-2xl shadow-sm p-4 sm:p-5 border border-gray-100">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-center gap-2 text-gray-700 font-semibold text-sm">
+                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <span>抽出統計ダッシュボード</span>
+                    <span id="stats-target-count" class="text-xs font-normal bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">対象: 0件</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 text-xs">
+                    <select id="stats-filter-period" class="rounded-lg border-gray-300 border px-2.5 py-1.5 bg-white text-gray-700 font-medium">
+                        <option value="all">全期間</option>
+                        <option value="30">直近30日</option>
+                        <option value="90">直近90日</option>
+                        <option value="365">直近1年</option>
+                    </select>
+                    <select id="stats-filter-drink" class="rounded-lg border-gray-300 border px-2.5 py-1.5 bg-white text-gray-700 font-medium">
+                        <option value="all">全ドリンク</option>
+                        <option value="black">ブラックのみ</option>
+                        <option value="latte">カフェラテのみ</option>
+                    </select>
+                    <select id="stats-filter-temp" class="rounded-lg border-gray-300 border px-2.5 py-1.5 bg-white text-gray-700 font-medium">
+                        <option value="all">Hot / Ice すべて</option>
+                        <option value="hot">Hotのみ</option>
+                        <option value="ice">Iceのみ</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPIサマリーカード -->
+        <div id="stats-kpi-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"></div>
+
+        <!-- 中段：総合点推移グラフ & 5項目平均レーダーチャート -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 glass-panel rounded-2xl shadow-sm p-5 border border-gray-100">
+                <div class="flex items-center justify-between mb-3 border-b pb-2">
+                    <h3 class="text-sm font-bold text-gray-700">総合点の推移（直近30抽出）</h3>
+                    <span class="text-[11px] text-gray-400">100点満点スコア</span>
+                </div>
+                <div id="stats-trend-chart" class="w-full overflow-x-auto"></div>
+            </div>
+
+            <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100 flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-2 border-b pb-2">
+                    <h3 class="text-sm font-bold text-gray-700">味わい平均プロファイル</h3>
+                    <span class="text-[11px] text-amber-700 font-semibold" id="stats-avg-sum-label">平均 - / 25点</span>
+                </div>
+                <div id="stats-radar-chart" class="my-auto py-2"></div>
+                <p class="text-[11px] text-gray-400 text-center">対象ログ全体の5項目平均値</p>
+            </div>
+        </div>
+
+        <!-- 銘柄別ランキング・集計 -->
+        <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100">
+            <div class="flex items-center justify-between mb-3 border-b pb-2">
+                <h3 class="text-sm font-bold text-gray-700">豆・銘柄別パフォーマンス</h3>
+                <span class="text-[11px] text-gray-400">抽出回数・平均スコア・最頻レシピ</span>
+            </div>
+            <div id="stats-beans-table" class="overflow-x-auto"></div>
+        </div>
+
+        <!-- 条件別分析グリッド（焙煎度合い別 / 4:6味調整別 / 湯温帯別 / 挽目別） -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100">
+                <h3 class="text-sm font-bold text-gray-700 mb-3 border-b pb-2">焙煎度合い別の傾向</h3>
+                <div id="stats-roast-breakdown" class="space-y-2.5"></div>
+            </div>
+
+            <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100">
+                <h3 class="text-sm font-bold text-gray-700 mb-3 border-b pb-2">4:6味調整（甘味・通常・酸味）別の傾向</h3>
+                <div id="stats-flavor-breakdown" class="space-y-2.5"></div>
+            </div>
+
+            <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100">
+                <h3 class="text-sm font-bold text-gray-700 mb-3 border-b pb-2">湯温帯別のスコア傾向</h3>
+                <div id="stats-temp-breakdown" class="space-y-2.5"></div>
+            </div>
+
+            <div class="glass-panel rounded-2xl shadow-sm p-5 border border-gray-100">
+                <h3 class="text-sm font-bold text-gray-700 mb-3 border-b pb-2">挽目・状態別のスコア傾向</h3>
+                <div id="stats-grind-breakdown" class="space-y-2.5"></div>
+            </div>
+        </div>
     </section>
 </main>
 
-<!-- スマホ専用 ボトムナビゲーション -->
+<!-- スマホ専用 ボトムナビゲーション（3タブ均等配置） -->
 <nav id="mobile-bottom-nav" class="hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 justify-around items-center h-16 z-50 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
     <button onclick="switchTab('record')" id="bottom-tab-btn-record" class="flex-1 flex flex-col items-center justify-center h-full text-blue-600 transition-colors">
-        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
         <span class="text-[10px] font-bold">記録する</span>
     </button>
     <button onclick="switchTab('history')" id="bottom-tab-btn-history" class="flex-1 flex flex-col items-center justify-center h-full text-gray-400 hover:text-gray-600 transition-colors">
-        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
         <span class="text-[10px] font-bold">履歴・検索</span>
+    </button>
+    <button onclick="switchTab('stats')" id="bottom-tab-btn-stats" class="flex-1 flex flex-col items-center justify-center h-full text-gray-400 hover:text-gray-600 transition-colors">
+        <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+        <span class="text-[10px] font-bold">統計</span>
     </button>
 </nav>
 
@@ -384,17 +588,29 @@
 
     let currentUser = null;
     let unsubscribeLogs = null;
+    let activeTab = 'record';
 
     let drinkType = 'black';
     let inputMode = 'beans'; 
     let flavorMode = 'normal';
+    let beanFormMode = 'beans'; // 'beans' | 'powder'
     let currentRecipe = null;
     let cloudLogs = []; 
     let filteredLogs = []; 
-    let sortOrder = 'desc'; 
+    let sortOrder = 'desc';
+
+    // 表示・ページネーション状態
+    let viewMode = 'grid'; // 'grid' | 'list'
+    let gridCols = 3;      // 1 ~ 5
+    let pageSize = 10;     // 10 ~ 50 (初期値10)
+    let currentPage = 1;
 
     const DEFAULT_GRIND = 18;
+    const DEFAULT_POWDER_GRIND = '中挽き';
     const DEFAULT_TEMP = 83;
+
+    const POWDER_GRIND_OPTIONS = ['粗挽き', '中粗挽き', '中挽き', '中細挽き', '細挽き', '極細挽き'];
+    const ROAST_LEVEL_OPTIONS = ['極浅煎り', '浅煎り', '中煎り', '中深煎り', '深煎り', '極深煎り'];
 
     const RATING_KEYS = [
         { id: 'acidity', label: '酸味' },
@@ -403,6 +619,14 @@
         { id: 'body', label: 'ボディ' },
         { id: 'aftertaste', label: '後味' }
     ];
+
+    const GRID_COL_CLASSES = {
+        1: 'grid grid-cols-1 gap-4',
+        2: 'grid grid-cols-1 sm:grid-cols-2 gap-4',
+        3: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4',
+        4: 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3',
+        5: 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2.5'
+    };
 
     const DOM = {
         authLoadingScreen: document.getElementById('auth-loading-screen'),
@@ -437,10 +661,19 @@
 
         logForm: document.getElementById('log-form'),
         btnSubmit: document.getElementById('btn-submit'),
+        btnFormBeans: document.getElementById('btn-form-beans'),
+        btnFormPowder: document.getElementById('btn-form-powder'),
+        logRoast: document.getElementById('log-roast'),
+        logGrindLabel: document.getElementById('log-grind-label'),
+        grindBeansWrapper: document.getElementById('grind-beans-wrapper'),
+        grindPowderWrapper: document.getElementById('grind-powder-wrapper'),
         logGrind: document.getElementById('log-grind'),
         logGrindSelect: document.getElementById('log-grind-select'),
+        logGrindPowder: document.getElementById('log-grind-powder'),
         logTemp: document.getElementById('log-temp'),
         logTempSelect: document.getElementById('log-temp-select'),
+        logTimeMin: document.getElementById('log-time-min'),
+        logTimeSec: document.getElementById('log-time-sec'),
         newRatingSum: document.getElementById('new-rating-sum'),
         logOverallScore: document.getElementById('log-overall-score'),
         logsContainer: document.getElementById('logs-container'),
@@ -452,9 +685,18 @@
         searchText: document.getElementById('search-text'),
         filterDrink: document.getElementById('filter-drink'),
         filterTemp: document.getElementById('filter-temp'),
+        filterRoast: document.getElementById('filter-roast'),
         sortCriteria: document.getElementById('sort-criteria'),
         btnSortOrder: document.getElementById('btn-sort-order'),
         logCountBadge: document.getElementById('log-count-badge'),
+
+        btnViewGrid: document.getElementById('btn-view-grid'),
+        btnViewList: document.getElementById('btn-view-list'),
+        gridColsControl: document.getElementById('grid-cols-control'),
+        selectGridCols: document.getElementById('select-grid-cols'),
+        selectPageSize: document.getElementById('select-page-size'),
+        paginationInfo: document.getElementById('pagination-info'),
+        paginationButtons: document.getElementById('pagination-buttons'),
 
         btnExportCsv: document.getElementById('btn-export-csv'),
         btnImportCsv: document.getElementById('btn-import-csv'),
@@ -462,11 +704,57 @@
         
         tabBtnRecord: document.getElementById('tab-btn-record'),
         tabBtnHistory: document.getElementById('tab-btn-history'),
+        tabBtnStats: document.getElementById('tab-btn-stats'),
         bottomTabBtnRecord: document.getElementById('bottom-tab-btn-record'),
         bottomTabBtnHistory: document.getElementById('bottom-tab-btn-history'),
+        bottomTabBtnStats: document.getElementById('bottom-tab-btn-stats'),
         contentRecord: document.getElementById('tab-content-record'),
-        contentHistory: document.getElementById('tab-content-history')
+        contentHistory: document.getElementById('tab-content-history'),
+        contentStats: document.getElementById('tab-content-stats'),
+
+        statsFilterPeriod: document.getElementById('stats-filter-period'),
+        statsFilterDrink: document.getElementById('stats-filter-drink'),
+        statsFilterTemp: document.getElementById('stats-filter-temp'),
+        statsTargetCount: document.getElementById('stats-target-count'),
+        statsKpiGrid: document.getElementById('stats-kpi-grid'),
+        statsTrendChart: document.getElementById('stats-trend-chart'),
+        statsRadarChart: document.getElementById('stats-radar-chart'),
+        statsAvgSumLabel: document.getElementById('stats-avg-sum-label'),
+        statsBeansTable: document.getElementById('stats-beans-table'),
+        statsRoastBreakdown: document.getElementById('stats-roast-breakdown'),
+        statsFlavorBreakdown: document.getElementById('stats-flavor-breakdown'),
+        statsTempBreakdown: document.getElementById('stats-temp-breakdown'),
+        statsGrindBreakdown: document.getElementById('stats-grind-breakdown')
     };
+
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function formatBrewTime(sec) {
+        if (sec === null || sec === undefined || sec === '' || isNaN(Number(sec))) return null;
+        const total = Math.max(0, Math.round(Number(sec)));
+        const m = Math.floor(total / 60);
+        const s = total % 60;
+        if (m > 0) {
+            return `${m}分${s.toString().padStart(2, '0')}秒`;
+        }
+        return `${s}秒`;
+    }
+
+    function formatGrindDisplay(log) {
+        const isPowder = log.beanForm === 'powder' || POWDER_GRIND_OPTIONS.includes(String(log.grind));
+        if (isPowder) {
+            return `粉(${log.grind || '中挽き'})`;
+        }
+        return `${log.grind} click`;
+    }
 
     function getUserLogsRef(uid) {
         return collection(db, 'users', uid, 'coffeeLogs');
@@ -508,7 +796,7 @@
             DOM.loginGateScreen.classList.add('hidden');
             DOM.appMainContainer.classList.remove('hidden');
             
-            DOM.desktopNav.classList.remove('hidden');
+            // スマホでは hidden を維持し、sm以上で flex にする
             DOM.desktopNav.classList.add('sm:flex');
             
             DOM.mobileBottomNav.classList.remove('hidden');
@@ -527,6 +815,8 @@
 
             if (window.location.hash === '#history') {
                 switchTab('history');
+            } else if (window.location.hash === '#stats') {
+                switchTab('stats');
             } else {
                 switchTab('record');
             }
@@ -538,7 +828,10 @@
                     cloudLogs.push({ id: docSnap.id, ...docSnap.data() });
                 });
                 updateBeansDatalist();
-                applyFiltersAndSort();
+                applyFiltersAndSort(false);
+                if (activeTab === 'stats') {
+                    renderStats();
+                }
             }, (error) => {
                 console.error("Snapshot error:", error);
                 showToast('データの同期に失敗しました', true);
@@ -549,7 +842,6 @@
             DOM.logsContainer.innerHTML = '';
 
             DOM.appMainContainer.classList.add('hidden');
-            DOM.desktopNav.classList.add('hidden');
             DOM.desktopNav.classList.remove('sm:flex');
             DOM.mobileBottomNav.classList.add('hidden');
             DOM.mobileBottomNav.classList.remove('flex', 'sm:hidden');
@@ -559,6 +851,30 @@
             DOM.loginGateScreen.classList.remove('hidden');
         }
     });
+
+    // 購入状態（豆 / 粉）切り替え
+    function updateBeanFormUI(mode) {
+        beanFormMode = mode;
+        const active = "flex-1 px-3 py-2 text-sm font-medium border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors";
+        const inactive = "flex-1 px-3 py-2 text-sm font-medium border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors";
+        
+        if (mode === 'beans') {
+            DOM.btnFormBeans.className = active + " rounded-l-lg";
+            DOM.btnFormPowder.className = inactive + " rounded-r-lg";
+            DOM.logGrindLabel.textContent = '挽目 (C3)';
+            DOM.grindBeansWrapper.classList.remove('hidden');
+            DOM.grindPowderWrapper.classList.add('hidden');
+        } else {
+            DOM.btnFormBeans.className = inactive + " rounded-l-lg";
+            DOM.btnFormPowder.className = active + " rounded-r-lg";
+            DOM.logGrindLabel.textContent = '挽目 (商品情報)';
+            DOM.grindBeansWrapper.classList.add('hidden');
+            DOM.grindPowderWrapper.classList.remove('hidden');
+        }
+    }
+
+    DOM.btnFormBeans.addEventListener('click', () => updateBeanFormUI('beans'));
+    DOM.btnFormPowder.addEventListener('click', () => updateBeanFormUI('powder'));
 
     function populateSelectOptions(selectEl, min, max, step, unit, defaultVal) {
         let html = `<option value="">リスト選択</option>`;
@@ -589,30 +905,30 @@
 
     window.switchTab = function(tabId) {
         if (!currentUser) return;
+        activeTab = tabId;
 
-        const topActiveClass = "border-b-2 border-blue-400 text-blue-400 px-2 h-full flex items-center text-sm font-medium transition-colors";
-        const topInactiveClass = "border-b-2 border-transparent text-slate-400 hover:text-slate-300 px-2 h-full flex items-center text-sm font-medium transition-colors";
+        const topActiveClass = "border-b-2 border-blue-400 text-blue-400 px-2 h-full flex items-center text-sm font-medium transition-colors whitespace-nowrap";
+        const topInactiveClass = "border-b-2 border-transparent text-slate-400 hover:text-slate-300 px-2 h-full flex items-center text-sm font-medium transition-colors whitespace-nowrap";
         
         const bottomActiveClass = "flex-1 flex flex-col items-center justify-center h-full text-blue-600 transition-colors";
         const bottomInactiveClass = "flex-1 flex flex-col items-center justify-center h-full text-gray-400 hover:text-gray-600 transition-colors";
 
-        if (tabId === 'record') {
-            DOM.tabBtnRecord.className = topActiveClass;
-            DOM.tabBtnHistory.className = topInactiveClass;
-            DOM.bottomTabBtnRecord.className = bottomActiveClass;
-            DOM.bottomTabBtnHistory.className = bottomInactiveClass;
-            
-            DOM.contentRecord.classList.remove('tab-hidden');
-            DOM.contentHistory.classList.add('tab-hidden');
-        } else {
-            DOM.tabBtnHistory.className = topActiveClass;
-            DOM.tabBtnRecord.className = topInactiveClass;
-            DOM.bottomTabBtnHistory.className = bottomActiveClass;
-            DOM.bottomTabBtnRecord.className = bottomInactiveClass;
-            
-            DOM.contentHistory.classList.remove('tab-hidden');
-            DOM.contentRecord.classList.add('tab-hidden');
-            applyFiltersAndSort();
+        DOM.tabBtnRecord.className = tabId === 'record' ? topActiveClass : topInactiveClass;
+        DOM.tabBtnHistory.className = tabId === 'history' ? topActiveClass : topInactiveClass;
+        DOM.tabBtnStats.className = tabId === 'stats' ? topActiveClass : topInactiveClass;
+
+        DOM.bottomTabBtnRecord.className = tabId === 'record' ? bottomActiveClass : bottomInactiveClass;
+        DOM.bottomTabBtnHistory.className = tabId === 'history' ? bottomActiveClass : bottomInactiveClass;
+        DOM.bottomTabBtnStats.className = tabId === 'stats' ? bottomActiveClass : bottomInactiveClass;
+
+        DOM.contentRecord.classList.toggle('tab-hidden', tabId !== 'record');
+        DOM.contentHistory.classList.toggle('tab-hidden', tabId !== 'history');
+        DOM.contentStats.classList.toggle('tab-hidden', tabId !== 'stats');
+
+        if (tabId === 'history') {
+            applyFiltersAndSort(false);
+        } else if (tabId === 'stats') {
+            renderStats();
         }
         window.scrollTo(0, 0);
     };
@@ -750,17 +1066,17 @@
             const buttons = [1, 2, 3, 4, 5].map(num => `
                 <label class="cursor-pointer">
                     <input type="radio" name="${prefix}_${item.id}" value="${num}" class="peer sr-only" ${num === val ? 'checked' : ''}>
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center border peer-checked:bg-yellow-400 peer-checked:text-white peer-checked:border-yellow-400 text-gray-400 hover:bg-gray-100 transition-colors text-sm">${num}</div>
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border peer-checked:bg-yellow-400 peer-checked:text-white peer-checked:border-yellow-400 text-gray-400 hover:bg-gray-100 transition-colors text-xs sm:text-sm">${num}</div>
                 </label>
             `).join('');
-            return `<div class="flex items-center justify-between"><span class="text-sm font-medium text-gray-600 w-12">${item.label}</span><div class="flex gap-1 sm:gap-1.5">${buttons}</div></div>`;
+            return `<div class="flex items-center justify-between"><span class="text-xs sm:text-sm font-medium text-gray-600 w-12">${item.label}</span><div class="flex gap-1">${buttons}</div></div>`;
         }).join('');
     }
     DOM.ratingContainer.innerHTML = generateRatingUI('new');
     DOM.ratingContainer.addEventListener('change', updateNewRatingSumDisplay);
     updateNewRatingSumDisplay();
 
-    function renderPentagonRadarSVG(ratings = {}) {
+    function renderPentagonRadarSVG(ratings = {}, maxWidthClass = 'max-w-[220px]') {
         const cx = 115;
         const cy = 96;
         const maxR = 54;
@@ -811,11 +1127,11 @@
             else if (Math.cos(c.angle) < -0.25) anchor = 'end';
 
             const dy = Math.sin(c.angle) > 0.5 ? 8 : (Math.sin(c.angle) < -0.5 ? -2 : 3);
-            return `<text x="${lx.toFixed(1)}" y="${(ly + dy).toFixed(1)}" text-anchor="${anchor}" font-size="10" font-weight="600" fill="#475569">${item.label}(${val})</text>`;
+            return `<text x="${lx.toFixed(1)}" y="${(ly + dy).toFixed(1)}" text-anchor="${anchor}" font-size="10" font-weight="600" fill="#475569">${item.label}(${Number(val.toFixed(1))})</text>`;
         }).join('');
 
         return `
-            <svg viewBox="0 0 230 192" class="w-full max-w-[230px] h-auto mx-auto select-none">
+            <svg viewBox="0 0 230 192" class="w-full ${maxWidthClass} h-auto mx-auto select-none">
                 ${gridPolygons}
                 ${axisLines}
                 <polygon points="${dataPointsStr}" fill="rgba(245, 158, 11, 0.25)" stroke="#F59E0B" stroke-width="2" stroke-linejoin="round" />
@@ -827,24 +1143,64 @@
 
     function updateBeansDatalist() {
         const uniqueBeans = [...new Set(cloudLogs.map(log => log.beansName))];
-        DOM.beansList.innerHTML = uniqueBeans.map(name => `<option value="${name}"></option>`).join('');
+        DOM.beansList.innerHTML = uniqueBeans.map(name => `<option value="${escapeHtml(name)}"></option>`).join('');
     }
+
+    // グリッド・リスト表示切替＆列数・ページサイズコントロール
+    function updateViewControlsUI() {
+        const activeBtn = "inline-flex items-center gap-1 px-2.5 py-1 rounded-md font-medium bg-slate-800 text-white transition-colors";
+        const inactiveBtn = "inline-flex items-center gap-1 px-2.5 py-1 rounded-md font-medium text-gray-600 hover:bg-gray-100 transition-colors";
+
+        if (viewMode === 'grid') {
+            DOM.btnViewGrid.className = activeBtn;
+            DOM.btnViewList.className = inactiveBtn;
+            DOM.gridColsControl.classList.remove('hidden');
+        } else {
+            DOM.btnViewList.className = activeBtn;
+            DOM.btnViewGrid.className = inactiveBtn;
+            DOM.gridColsControl.classList.add('hidden');
+        }
+    }
+
+    DOM.btnViewGrid.addEventListener('click', () => {
+        viewMode = 'grid';
+        updateViewControlsUI();
+        renderLogs();
+    });
+
+    DOM.btnViewList.addEventListener('click', () => {
+        viewMode = 'list';
+        updateViewControlsUI();
+        renderLogs();
+    });
+
+    DOM.selectGridCols.addEventListener('change', () => {
+        gridCols = parseInt(DOM.selectGridCols.value, 10) || 3;
+        renderLogs();
+    });
+
+    DOM.selectPageSize.addEventListener('change', () => {
+        pageSize = parseInt(DOM.selectPageSize.value, 10) || 10;
+        currentPage = 1;
+        renderLogs();
+    });
 
     DOM.btnSortOrder.addEventListener('click', () => {
         sortOrder = sortOrder === 'desc' ? 'asc' : 'desc';
-        const labelText = sortOrder === 'desc' ? '降順 (新しい/高い順)' : '昇順 (古い/低い順)';
+        const labelText = sortOrder === 'desc' ? '降順 (新/高)' : '昇順 (古/低)';
         const iconSvg = sortOrder === 'desc' 
-            ? '<svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>'
-            : '<svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>';
-        DOM.btnSortOrder.innerHTML = `<span>${labelText}</span>${iconSvg}`;
-        applyFiltersAndSort();
+            ? '<svg class="w-4 h-4 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>'
+            : '<svg class="w-4 h-4 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>';
+        DOM.btnSortOrder.innerHTML = `<span class="truncate">${labelText}</span>${iconSvg}`;
+        applyFiltersAndSort(true);
     });
 
-    function applyFiltersAndSort() {
+    function applyFiltersAndSort(resetPage = true) {
         if (!currentUser) return;
         const searchText = DOM.searchText.value.toLowerCase();
         const filterDrinkVal = DOM.filterDrink.value;
         const filterTempVal = DOM.filterTemp.value;
+        const filterRoastVal = DOM.filterRoast.value;
         const sortCriteriaVal = DOM.sortCriteria.value;
 
         filteredLogs = cloudLogs.filter(log => {
@@ -856,7 +1212,9 @@
             const isIce = log.recipe ? !!log.recipe.isIce : false;
             if (filterTempVal === 'hot') matchTemp = !isIce;
             if (filterTempVal === 'ice') matchTemp = isIce;
-            return matchText && matchDrink && matchTemp;
+            let matchRoast = true;
+            if (filterRoastVal !== 'all') matchRoast = (log.roastLevel || '') === filterRoastVal;
+            return matchText && matchDrink && matchTemp && matchRoast;
         });
 
         filteredLogs.sort((a, b) => {
@@ -870,6 +1228,9 @@
             } else if (sortCriteriaVal === 'ratingSum') {
                 valA = calcRatingSum(a.ratings);
                 valB = calcRatingSum(b.ratings);
+            } else if (sortCriteriaVal === 'brewTime') {
+                valA = (a.brewTimeSec !== undefined && a.brewTimeSec !== null) ? Number(a.brewTimeSec) : -1;
+                valB = (b.brewTimeSec !== undefined && b.brewTimeSec !== null) ? Number(b.brewTimeSec) : -1;
             } else {
                 valA = (a.ratings && a.ratings[sortCriteriaVal]) || 0;
                 valB = (b.ratings && b.ratings[sortCriteriaVal]) || 0;
@@ -877,14 +1238,18 @@
             return (valB - valA) * (sortOrder === 'desc' ? 1 : -1);
         });
 
+        if (resetPage) {
+            currentPage = 1;
+        }
         DOM.logCountBadge.textContent = `${filteredLogs.length}件`;
         renderLogs();
     }
 
-    DOM.searchText.addEventListener('input', applyFiltersAndSort);
-    DOM.filterDrink.addEventListener('change', applyFiltersAndSort);
-    DOM.filterTemp.addEventListener('change', applyFiltersAndSort);
-    DOM.sortCriteria.addEventListener('change', applyFiltersAndSort);
+    DOM.searchText.addEventListener('input', () => applyFiltersAndSort(true));
+    DOM.filterDrink.addEventListener('change', () => applyFiltersAndSort(true));
+    DOM.filterTemp.addEventListener('change', () => applyFiltersAndSort(true));
+    DOM.filterRoast.addEventListener('change', () => applyFiltersAndSort(true));
+    DOM.sortCriteria.addEventListener('change', () => applyFiltersAndSort(true));
 
     DOM.logForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -905,13 +1270,26 @@
         const rawOverall = DOM.logOverallScore.value.trim();
         const overallScore = rawOverall !== '' ? Number(rawOverall) : null;
 
+        const rawMin = DOM.logTimeMin.value.trim();
+        const rawSec = DOM.logTimeSec.value.trim();
+        let brewTimeSec = null;
+        if (rawMin !== '' || rawSec !== '') {
+            brewTimeSec = (parseInt(rawMin, 10) || 0) * 60 + (parseInt(rawSec, 10) || 0);
+        }
+
+        const grindValue = beanFormMode === 'powder' ? DOM.logGrindPowder.value : DOM.logGrind.value;
+        const roastLevel = DOM.logRoast.value || '';
+
         let logDateObj = DOM.logDatetime.value ? new Date(DOM.logDatetime.value) : new Date();
         const firestoreTimestamp = Timestamp.fromDate(logDateObj);
 
         const newLogData = {
             beansName: document.getElementById('log-beans-name').value,
-            grind: DOM.logGrind.value,
+            beanForm: beanFormMode,
+            roastLevel: roastLevel,
+            grind: grindValue,
             temp: DOM.logTemp.value,
+            brewTimeSec: brewTimeSec,
             notes: DOM.logNotes.value,
             ratings: ratings,
             ratingSum: ratingSum,
@@ -925,10 +1303,13 @@
             showToast('クラウドに記録を保存しました！');
             DOM.logForm.reset();
             
+            updateBeanFormUI('beans');
             DOM.logGrind.value = DEFAULT_GRIND;
             DOM.logGrindSelect.value = String(DEFAULT_GRIND);
+            DOM.logGrindPowder.value = DEFAULT_POWDER_GRIND;
             DOM.logTemp.value = DEFAULT_TEMP;
             DOM.logTempSelect.value = String(DEFAULT_TEMP);
+            DOM.logRoast.value = '';
 
             DOM.ratingContainer.innerHTML = generateRatingUI('new');
             updateNewRatingSumDisplay();
@@ -960,149 +1341,375 @@
         return html;
     }
 
-    function renderLogs() {
-        if (!currentUser) return;
-        if (filteredLogs.length === 0) {
-            DOM.logsContainer.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10 border-2 border-dashed border-gray-200 rounded-xl">条件に一致する記録がありません。</div>`;
+    function buildPowderSelectOptionsHtml(currentVal) {
+        return POWDER_GRIND_OPTIONS.map(opt => {
+            const selected = opt === currentVal ? 'selected' : '';
+            return `<option value="${opt}" ${selected}>${opt}</option>`;
+        }).join('');
+    }
+
+    function buildRoastSelectOptionsHtml(currentVal) {
+        let html = `<option value="">未選択</option>`;
+        ROAST_LEVEL_OPTIONS.forEach(opt => {
+            const selected = opt === currentVal ? 'selected' : '';
+            html += `<option value="${opt}" ${selected}>${opt}</option>`;
+        });
+        return html;
+    }
+
+    window.toggleEditBeanForm = function(id, formMode) {
+        const beansBox = document.getElementById(`edit-grind-beans-box-${id}`);
+        const powderBox = document.getElementById(`edit-grind-powder-box-${id}`);
+        if (!beansBox || !powderBox) return;
+        if (formMode === 'powder') {
+            beansBox.classList.add('hidden');
+            powderBox.classList.remove('hidden');
+        } else {
+            beansBox.classList.remove('hidden');
+            powderBox.classList.add('hidden');
+        }
+    };
+
+    window.goToPage = function(page) {
+        const totalPages = Math.max(1, Math.ceil(filteredLogs.length / pageSize));
+        currentPage = Math.min(Math.max(1, page), totalPages);
+        renderLogs();
+        DOM.logsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+
+    function renderPagination(totalItems, totalPages, startIdx, endIdx) {
+        if (totalItems === 0) {
+            DOM.paginationInfo.textContent = '0件中 0〜0件を表示';
+            DOM.paginationButtons.innerHTML = '';
             return;
         }
 
-        DOM.logsContainer.innerHTML = filteredLogs.map(log => {
-            const logDate = log.createdAt ? log.createdAt.toDate() : new Date();
-            const dateStr = logDate.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
-            const recipe = log.recipe || { drinkType: 'black', beans: 0, isIce: false, flavor: 'normal', milkAmount: 0 };
-            
-            const tempBadge = recipe.isIce 
-                ? '<span class="bg-blue-100 text-blue-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Ice</span>'
-                : '<span class="bg-orange-100 text-orange-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Hot</span>';
-            
-            const isLatte = recipe.drinkType === 'latte';
-            const drinkBadge = isLatte
-                ? '<span class="bg-stone-200 text-stone-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Latte</span>'
-                : '<span class="bg-slate-200 text-slate-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Black</span>';
+        DOM.paginationInfo.textContent = `全 ${totalItems} 件中 ${startIdx + 1}〜${endIdx} 件を表示（${currentPage} / ${totalPages} ページ）`;
 
-            const flavorLabels = { sweet: '甘味', normal: '通常', acidic: '酸味' };
-            const flavorName = recipe.flavor ? (flavorLabels[recipe.flavor] || '通常') : '通常';
+        if (totalPages <= 1) {
+            DOM.paginationButtons.innerHTML = '';
+            return;
+        }
 
-            const ratingSum = calcRatingSum(log.ratings);
-            const hasOverall = log.overallScore !== undefined && log.overallScore !== null && log.overallScore !== '';
-            const overallDisplay = hasOverall ? `${log.overallScore}<span class="text-xs font-normal text-slate-300"> / 100点</span>` : `<span class="text-xs font-normal text-slate-400">未入力</span>`;
+        let btns = [];
+        btns.push(`
+            <button type="button" onclick="window.goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-2.5 py-1.5 rounded border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:pointer-events-none font-medium">
+                前へ
+            </button>
+        `);
 
-            const radarSvg = renderPentagonRadarSVG(log.ratings);
+        const pages = [];
+        for (let p = 1; p <= totalPages; p++) {
+            if (p === 1 || p === totalPages || (p >= currentPage - 1 && p <= currentPage + 1)) {
+                pages.push(p);
+            } else if (pages[pages.length - 1] !== '...') {
+                pages.push('...');
+            }
+        }
 
-            const notesHtml = log.notes ? `<div class="mt-2.5 p-2 bg-yellow-50 text-gray-700 text-xs rounded border border-yellow-100 leading-tight"><svg class="w-3.5 h-3.5 inline-block text-yellow-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>${String(log.notes).replace(/\n/g, '<br>')}</div>` : '';
-            const detailMilk = isLatte ? `<div><span class="block text-[10px] text-gray-400">ミルク</span>${recipe.milkAmount}ml</div>` : '';
+        pages.forEach(p => {
+            if (p === '...') {
+                btns.push(`<span class="px-1.5 text-gray-400">…</span>`);
+            } else {
+                const isCurrent = p === currentPage;
+                const cls = isCurrent
+                    ? 'px-2.5 py-1.5 rounded bg-slate-800 text-white font-bold'
+                    : 'px-2.5 py-1.5 rounded border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-medium';
+                btns.push(`<button type="button" onclick="window.goToPage(${p})" class="${cls}">${p}</button>`);
+            }
+        });
 
-            return `
-                <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow h-fit relative">
-                    
-                    <!-- 表示モード -->
-                    <div id="display-mode-${log.id}">
-                        <div class="flex flex-col gap-1 mb-3 pb-2 border-b border-gray-100">
-                            <h3 class="font-bold text-gray-800 text-sm leading-tight">${log.beansName}</h3>
-                            <div class="flex items-center justify-between mt-1">
-                                <div class="flex gap-1">${drinkBadge}${tempBadge}</div>
-                                <span class="text-[10px] text-gray-400">${dateStr}</span>
-                            </div>
+        btns.push(`
+            <button type="button" onclick="window.goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-2.5 py-1.5 rounded border border-gray-300 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:pointer-events-none font-medium">
+                次へ
+            </button>
+        `);
+
+        DOM.paginationButtons.innerHTML = btns.join('');
+    }
+
+    function renderEditFormHtml(log) {
+        const isPowder = log.beanForm === 'powder' || POWDER_GRIND_OPTIONS.includes(String(log.grind));
+        const currentForm = isPowder ? 'powder' : 'beans';
+        const numericGrind = !isPowder ? log.grind : DEFAULT_GRIND;
+        const powderGrind = isPowder ? log.grind : DEFAULT_POWDER_GRIND;
+        const hasOverall = log.overallScore !== undefined && log.overallScore !== null && log.overallScore !== '';
+
+        const totalSec = (log.brewTimeSec !== undefined && log.brewTimeSec !== null) ? Number(log.brewTimeSec) : null;
+        const editMin = totalSec !== null ? Math.floor(totalSec / 60) : '';
+        const editSec = totalSec !== null ? (totalSec % 60) : '';
+
+        return `
+            <div id="edit-mode-${log.id}" class="hidden">
+                <p class="text-sm font-bold text-gray-700 mb-3 border-b pb-2">記録を編集</p>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[10px] text-gray-500 mb-1">抽出日時</label>
+                        <input type="datetime-local" id="edit-datetime-${log.id}" value="${formatDateForInput(log.createdAt)}" class="w-full text-xs rounded border-gray-300 px-2 py-1.5 border">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-gray-500 mb-1">豆の種類・銘柄</label>
+                        <input type="text" id="edit-beans-${log.id}" value="${escapeHtml(log.beansName)}" class="w-full text-xs rounded border-gray-300 px-2 py-1.5 border">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] text-gray-500 mb-1">状態</label>
+                            <select id="edit-beanform-${log.id}" onchange="window.toggleEditBeanForm('${log.id}', this.value)" class="w-full text-xs rounded border-gray-300 px-2 py-1.5 border bg-white">
+                                <option value="beans" ${currentForm === 'beans' ? 'selected' : ''}>豆</option>
+                                <option value="powder" ${currentForm === 'powder' ? 'selected' : ''}>粉</option>
+                            </select>
                         </div>
-
-                        <div class="grid grid-cols-2 gap-2 mb-3">
-                            <div class="bg-slate-800 text-white rounded-lg px-3 py-2 text-center">
-                                <span class="block text-[10px] text-slate-300">総合点</span>
-                                <span class="text-base font-bold">${overallDisplay}</span>
-                            </div>
-                            <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg px-3 py-2 text-center">
-                                <span class="block text-[10px] text-amber-700">5項目合計</span>
-                                <span class="text-base font-bold">${ratingSum}<span class="text-xs font-normal text-amber-700"> / 25点</span></span>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-y-2 gap-x-2 text-xs text-gray-600 mb-3 bg-gray-50 p-2.5 rounded">
-                            <div><span class="block text-[10px] text-gray-400">豆量</span>${recipe.beans}g</div>
-                            <div><span class="block text-[10px] text-gray-400">傾向</span>${flavorName}</div>
-                            <div><span class="block text-[10px] text-gray-400">湯温</span>${log.temp}℃</div>
-                            <div><span class="block text-[10px] text-gray-400">挽目</span>${log.grind}</div>
-                            ${isLatte ? detailMilk : ''}
-                        </div>
-
-                        <div class="bg-slate-50/70 rounded-xl py-1 px-2 border border-slate-100 mb-2">
-                            ${radarSvg}
-                        </div>
-
-                        ${notesHtml}
-                        <div class="flex justify-end mt-3 border-t pt-3">
-                            <button onclick="window.toggleEditMode('${log.id}', true)" class="text-xs px-2.5 py-1 text-slate-600 border border-slate-300 rounded hover:bg-slate-50 transition-colors">記録を編集する</button>
+                        <div>
+                            <label class="block text-[10px] text-gray-500 mb-1">焙煎度合い</label>
+                            <select id="edit-roast-${log.id}" class="w-full text-xs rounded border-gray-300 px-2 py-1.5 border bg-white">
+                                ${buildRoastSelectOptionsHtml(log.roastLevel || '')}
+                            </select>
                         </div>
                     </div>
-
-                    <!-- 編集モード -->
-                    <div id="edit-mode-${log.id}" class="hidden">
-                        <p class="text-sm font-bold text-gray-700 mb-3 border-b pb-2">記録を編集</p>
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-[10px] text-gray-500 mb-1">抽出日時</label>
-                                <input type="datetime-local" id="edit-datetime-${log.id}" value="${formatDateForInput(log.createdAt)}" class="w-full text-xs rounded border-gray-300 px-2 py-1.5 border">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] text-gray-500 mb-1">挽目</label>
+                            <div id="edit-grind-beans-box-${log.id}" class="flex gap-1 ${currentForm === 'powder' ? 'hidden' : ''}">
+                                <input type="number" id="edit-grind-${log.id}" value="${escapeHtml(numericGrind)}" step="0.5" inputmode="decimal" class="w-1/2 text-xs rounded border-gray-300 px-1.5 py-1.5 border">
+                                <select onchange="document.getElementById('edit-grind-${log.id}').value=this.value" class="w-1/2 text-[11px] rounded border-gray-300 px-1 py-1.5 border bg-white">
+                                    ${buildSelectOptionsHtml(8, 30, '', numericGrind)}
+                                </select>
                             </div>
-                            <div>
-                                <label class="block text-[10px] text-gray-500 mb-1">豆の種類・銘柄</label>
-                                <input type="text" id="edit-beans-${log.id}" value="${log.beansName}" class="w-full text-xs rounded border-gray-300 px-2 py-1.5 border">
+                            <div id="edit-grind-powder-box-${log.id}" class="${currentForm === 'beans' ? 'hidden' : ''}">
+                                <select id="edit-grind-powder-${log.id}" class="w-full text-xs rounded border-gray-300 px-2 py-1.5 border bg-white">
+                                    ${buildPowderSelectOptionsHtml(powderGrind)}
+                                </select>
                             </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label class="block text-[10px] text-gray-500 mb-1">挽目 (C3)</label>
-                                    <div class="flex gap-1">
-                                        <input type="number" id="edit-grind-${log.id}" value="${log.grind}" step="0.5" inputmode="decimal" class="w-1/2 text-xs rounded border-gray-300 px-1.5 py-1.5 border">
-                                        <select onchange="document.getElementById('edit-grind-${log.id}').value=this.value" class="w-1/2 text-[11px] rounded border-gray-300 px-1 py-1.5 border bg-white">
-                                            ${buildSelectOptionsHtml(8, 30, '', log.grind)}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] text-gray-500 mb-1">湯温 (℃)</label>
-                                    <div class="flex gap-1">
-                                        <input type="number" id="edit-temp-${log.id}" value="${log.temp}" step="0.5" inputmode="decimal" class="w-1/2 text-xs rounded border-gray-300 px-1.5 py-1.5 border">
-                                        <select onchange="document.getElementById('edit-temp-${log.id}').value=this.value" class="w-1/2 text-[11px] rounded border-gray-300 px-1 py-1.5 border bg-white">
-                                            ${buildSelectOptionsHtml(75, 96, '℃', log.temp)}
-                                        </select>
-                                    </div>
-                                </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-gray-500 mb-1">湯温 (℃)</label>
+                            <div class="flex gap-1">
+                                <input type="number" id="edit-temp-${log.id}" value="${escapeHtml(log.temp)}" step="0.5" inputmode="decimal" class="w-1/2 text-xs rounded border-gray-300 px-1.5 py-1.5 border">
+                                <select onchange="document.getElementById('edit-temp-${log.id}').value=this.value" class="w-1/2 text-[11px] rounded border-gray-300 px-1 py-1.5 border bg-white">
+                                    ${buildSelectOptionsHtml(75, 96, '℃', log.temp)}
+                                </select>
                             </div>
-                            <div>
-                                <label class="block text-[10px] text-gray-500 mb-1">総合点 (100点満点)</label>
-                                <input type="number" id="edit-overall-${log.id}" value="${hasOverall ? log.overallScore : ''}" min="0" max="100" step="1" placeholder="未入力" class="w-full text-xs rounded border-gray-300 px-2 py-1.5 border">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] text-gray-500 mb-1">抽出時間 (分 / 秒)</label>
+                            <div class="flex items-center gap-1">
+                                <input type="number" id="edit-time-min-${log.id}" value="${editMin}" min="0" max="59" placeholder="分" class="w-1/2 text-xs rounded border-gray-300 px-1.5 py-1.5 border text-right">
+                                <span class="text-[10px] text-gray-500">分</span>
+                                <input type="number" id="edit-time-sec-${log.id}" value="${editSec}" min="0" max="59" placeholder="秒" class="w-1/2 text-xs rounded border-gray-300 px-1.5 py-1.5 border text-right">
+                                <span class="text-[10px] text-gray-500">秒</span>
                             </div>
-                            <div>
-                                <label class="block text-[10px] text-gray-500 mb-1">評価</label>
-                                <div class="bg-gray-50 p-2 rounded-lg">
-                                    ${generateRatingUI(`edit_${log.id}`, log.ratings)}
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] text-gray-500 mb-1">メモ</label>
-                                <textarea id="edit-notes-${log.id}" rows="2" class="w-full text-xs rounded border-gray-300 px-2 py-1.5 border">${log.notes || ''}</textarea>
-                            </div>
-                            <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-100">
-                                <button onclick="window.deleteLog('${log.id}')" class="text-xs px-2.5 py-1.5 text-red-600 hover:bg-red-50 rounded transition-colors">削除</button>
-                                <div class="flex gap-2">
-                                    <button onclick="window.toggleEditMode('${log.id}', false)" class="text-xs px-3 py-1.5 text-slate-600 bg-white border border-slate-300 rounded hover:bg-slate-50 transition-colors">キャンセル</button>
-                                    <button onclick="window.saveEdit('${log.id}')" class="text-xs px-3 py-1.5 bg-slate-800 text-white rounded hover:bg-slate-700 transition-colors">更新して保存</button>
-                                </div>
-                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-gray-500 mb-1">総合点 (100点満点)</label>
+                            <input type="number" id="edit-overall-${log.id}" value="${hasOverall ? log.overallScore : ''}" min="0" max="100" step="1" placeholder="未入力" class="w-full text-xs rounded border-gray-300 px-2 py-1.5 border">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-gray-500 mb-1">評価</label>
+                        <div class="bg-gray-50 p-2 rounded-lg">
+                            ${generateRatingUI(`edit_${log.id}`, log.ratings)}
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-gray-500 mb-1">メモ</label>
+                        <textarea id="edit-notes-${log.id}" rows="2" class="w-full text-xs rounded border-gray-300 px-2 py-1.5 border">${escapeHtml(log.notes || '')}</textarea>
+                    </div>
+                    <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-100">
+                        <button onclick="window.deleteLog('${log.id}')" class="text-xs px-2.5 py-1.5 text-red-600 hover:bg-red-50 rounded transition-colors">削除</button>
+                        <div class="flex gap-2">
+                            <button onclick="window.toggleEditMode('${log.id}', false)" class="text-xs px-3 py-1.5 text-slate-600 bg-white border border-slate-300 rounded hover:bg-slate-50 transition-colors">キャンセル</button>
+                            <button onclick="window.saveEdit('${log.id}')" class="text-xs px-3 py-1.5 bg-slate-800 text-white rounded hover:bg-slate-700 transition-colors">更新して保存</button>
                         </div>
                     </div>
                 </div>
-            `;
-        }).join('');
+            </div>
+        `;
+    }
+
+    function renderLogs() {
+        if (!currentUser) return;
+        const totalItems = filteredLogs.length;
+        const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        if (totalItems === 0) {
+            DOM.logsContainer.className = 'block';
+            DOM.logsContainer.innerHTML = `<div class="text-center text-gray-500 py-10 border-2 border-dashed border-gray-200 rounded-xl">条件に一致する記録がありません。</div>`;
+            renderPagination(0, 1, 0, 0);
+            return;
+        }
+
+        const startIdx = (currentPage - 1) * pageSize;
+        const endIdx = Math.min(startIdx + pageSize, totalItems);
+        const pageLogs = filteredLogs.slice(startIdx, endIdx);
+
+        if (viewMode === 'list') {
+            DOM.logsContainer.className = 'flex flex-col gap-2.5';
+            DOM.logsContainer.innerHTML = pageLogs.map(log => {
+                const logDate = log.createdAt ? log.createdAt.toDate() : new Date();
+                const dateStr = logDate.toLocaleDateString('ja-JP', { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit' });
+                const recipe = log.recipe || { drinkType: 'black', beans: 0, isIce: false, flavor: 'normal', milkAmount: 0 };
+                
+                const tempBadge = recipe.isIce 
+                    ? '<span class="bg-blue-100 text-blue-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Ice</span>'
+                    : '<span class="bg-orange-100 text-orange-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Hot</span>';
+                const drinkBadge = recipe.drinkType === 'latte'
+                    ? '<span class="bg-stone-200 text-stone-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Latte</span>'
+                    : '<span class="bg-slate-200 text-slate-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Black</span>';
+                const roastBadge = log.roastLevel
+                    ? `<span class="bg-amber-100/80 text-amber-800 text-[10px] px-1.5 py-0.5 rounded font-medium">${escapeHtml(log.roastLevel)}</span>`
+                    : '';
+
+                const flavorLabels = { sweet: '甘味', normal: '通常', acidic: '酸味' };
+                const flavorName = flavorLabels[recipe.flavor] || '通常';
+                const brewTimeStr = formatBrewTime(log.brewTimeSec);
+                const ratingSum = calcRatingSum(log.ratings);
+                const hasOverall = log.overallScore !== undefined && log.overallScore !== null && log.overallScore !== '';
+
+                return `
+                    <div class="bg-white border border-gray-200/80 rounded-xl p-3 sm:px-4 shadow-sm hover:shadow transition-shadow">
+                        <div id="display-mode-${log.id}" class="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                                    <h3 class="font-bold text-gray-800 text-sm truncate max-w-full">${escapeHtml(log.beansName)}</h3>
+                                    ${drinkBadge}${tempBadge}${roastBadge}
+                                    <span class="text-[11px] text-gray-400 ml-auto lg:ml-1">${dateStr}</span>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-600">
+                                    <span>豆: <strong class="text-gray-800">${recipe.beans}g</strong></span>
+                                    <span>湯温: <strong class="text-gray-800">${escapeHtml(log.temp)}℃</strong></span>
+                                    <span>挽目: <strong class="text-gray-800">${escapeHtml(formatGrindDisplay(log))}</strong></span>
+                                    <span>傾向: <strong class="text-gray-800">${flavorName}</strong></span>
+                                    ${brewTimeStr ? `<span>時間: <strong class="text-gray-800">${brewTimeStr}</strong></span>` : ''}
+                                </div>
+                                ${log.notes ? `<p class="text-[11px] text-gray-500 mt-1 truncate">📝 ${escapeHtml(log.notes)}</p>` : ''}
+                            </div>
+
+                            <div class="flex items-center justify-between lg:justify-end gap-3 pt-2 lg:pt-0 border-t lg:border-t-0 border-gray-100 shrink-0">
+                                <div class="flex items-center gap-2">
+                                    <div class="bg-slate-800 text-white rounded-lg px-2.5 py-1 text-center min-w-[68px]">
+                                        <span class="block text-[9px] text-slate-300 leading-none mb-0.5">総合点</span>
+                                        <span class="text-xs font-bold">${hasOverall ? `${log.overallScore}点` : '-'}</span>
+                                    </div>
+                                    <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg px-2.5 py-1 text-center min-w-[68px]">
+                                        <span class="block text-[9px] text-amber-700 leading-none mb-0.5">5項目</span>
+                                        <span class="text-xs font-bold">${ratingSum}/25</span>
+                                    </div>
+                                </div>
+                                <button onclick="window.toggleEditMode('${log.id}', true)" class="text-xs px-2.5 py-1.5 text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors whitespace-nowrap">
+                                    編集
+                                </button>
+                            </div>
+                        </div>
+                        ${renderEditFormHtml(log)}
+                    </div>
+                `;
+            }).join('');
+        } else {
+            // グリッド表示（列数に応じたサイズ自動調整）
+            DOM.logsContainer.className = GRID_COL_CLASSES[gridCols] || GRID_COL_CLASSES[3];
+            const isDense = gridCols >= 4;
+            const cardPadClass = isDense ? 'p-3' : 'p-4';
+            const radarWidthClass = gridCols === 5 ? 'max-w-[145px]' : (gridCols === 4 ? 'max-w-[170px]' : 'max-w-[220px]');
+            const titleSizeClass = isDense ? 'text-xs' : 'text-sm';
+
+            DOM.logsContainer.innerHTML = pageLogs.map(log => {
+                const logDate = log.createdAt ? log.createdAt.toDate() : new Date();
+                const dateStr = logDate.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
+                const recipe = log.recipe || { drinkType: 'black', beans: 0, isIce: false, flavor: 'normal', milkAmount: 0 };
+                
+                const tempBadge = recipe.isIce 
+                    ? '<span class="bg-blue-100 text-blue-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Ice</span>'
+                    : '<span class="bg-orange-100 text-orange-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Hot</span>';
+                
+                const isLatte = recipe.drinkType === 'latte';
+                const drinkBadge = isLatte
+                    ? '<span class="bg-stone-200 text-stone-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Latte</span>'
+                    : '<span class="bg-slate-200 text-slate-700 text-[10px] px-1.5 py-0.5 rounded font-semibold">Black</span>';
+
+                const roastBadge = log.roastLevel
+                    ? `<span class="bg-amber-100/80 text-amber-800 text-[10px] px-1.5 py-0.5 rounded font-medium">${escapeHtml(log.roastLevel)}</span>`
+                    : '';
+
+                const flavorLabels = { sweet: '甘味', normal: '通常', acidic: '酸味' };
+                const flavorName = recipe.flavor ? (flavorLabels[recipe.flavor] || '通常') : '通常';
+                const brewTimeStr = formatBrewTime(log.brewTimeSec);
+
+                const ratingSum = calcRatingSum(log.ratings);
+                const hasOverall = log.overallScore !== undefined && log.overallScore !== null && log.overallScore !== '';
+                const overallDisplay = hasOverall
+                    ? `${log.overallScore}<span class="${isDense ? 'text-[10px]' : 'text-xs'} font-normal text-slate-300"> / 100点</span>`
+                    : `<span class="text-xs font-normal text-slate-400">未入力</span>`;
+
+                const radarSvg = renderPentagonRadarSVG(log.ratings, radarWidthClass);
+
+                const notesHtml = log.notes ? `<div class="mt-2 p-2 bg-yellow-50 text-gray-700 text-[11px] rounded border border-yellow-100 leading-tight"><svg class="w-3 h-3 inline-block text-yellow-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>${escapeHtml(log.notes).replace(/\n/g, '<br>')}</div>` : '';
+                const detailMilk = isLatte ? `<div><span class="block text-[10px] text-gray-400">ミルク</span>${recipe.milkAmount}ml</div>` : '';
+                const detailTime = brewTimeStr ? `<div><span class="block text-[10px] text-gray-400">抽出時間</span>${brewTimeStr}</div>` : '';
+
+                return `
+                    <div class="bg-white border border-gray-100 rounded-xl ${cardPadClass} shadow-sm hover:shadow-md transition-shadow h-fit relative">
+                        <div id="display-mode-${log.id}">
+                            <div class="flex flex-col gap-1 mb-2.5 pb-2 border-b border-gray-100">
+                                <h3 class="font-bold text-gray-800 ${titleSizeClass} leading-tight line-clamp-2">${escapeHtml(log.beansName)}</h3>
+                                <div class="flex flex-wrap items-center justify-between gap-1 mt-1">
+                                    <div class="flex flex-wrap gap-1">${drinkBadge}${tempBadge}${roastBadge}</div>
+                                    <span class="text-[10px] text-gray-400">${dateStr}</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-1.5 mb-2.5">
+                                <div class="bg-slate-800 text-white rounded-lg px-2 py-1.5 text-center">
+                                    <span class="block text-[9px] text-slate-300">総合点</span>
+                                    <span class="${isDense ? 'text-xs' : 'text-sm'} font-bold">${overallDisplay}</span>
+                                </div>
+                                <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg px-2 py-1.5 text-center">
+                                    <span class="block text-[9px] text-amber-700">5項目合計</span>
+                                    <span class="${isDense ? 'text-xs' : 'text-sm'} font-bold">${ratingSum}<span class="text-[10px] font-normal text-amber-700"> / 25点</span></span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-y-1.5 gap-x-2 text-[11px] text-gray-600 mb-2.5 bg-gray-50 p-2 rounded">
+                                <div><span class="block text-[9px] text-gray-400">豆量</span>${recipe.beans}g</div>
+                                <div><span class="block text-[9px] text-gray-400">傾向</span>${flavorName}</div>
+                                <div><span class="block text-[9px] text-gray-400">湯温</span>${escapeHtml(log.temp)}℃</div>
+                                <div><span class="block text-[9px] text-gray-400">挽目</span>${escapeHtml(formatGrindDisplay(log))}</div>
+                                ${detailMilk}
+                                ${detailTime}
+                            </div>
+
+                            <div class="bg-slate-50/70 rounded-xl py-1 px-1.5 border border-slate-100 mb-2">
+                                ${radarSvg}
+                            </div>
+
+                            ${notesHtml}
+                            <div class="flex justify-end mt-2.5 border-t pt-2">
+                                <button onclick="window.toggleEditMode('${log.id}', true)" class="text-[11px] px-2.5 py-1 text-slate-600 border border-slate-300 rounded hover:bg-slate-50 transition-colors">記録を編集する</button>
+                            </div>
+                        </div>
+
+                        ${renderEditFormHtml(log)}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        renderPagination(totalItems, totalPages, startIdx, endIdx);
     }
 
     window.toggleEditMode = function(id, isEdit) {
         if (!currentUser) return;
+        const disp = document.getElementById(`display-mode-${id}`);
+        const edit = document.getElementById(`edit-mode-${id}`);
+        if (!disp || !edit) return;
         if (isEdit) {
-            document.getElementById(`display-mode-${id}`).classList.add('hidden');
-            document.getElementById(`edit-mode-${id}`).classList.remove('hidden');
+            disp.classList.add('hidden');
+            edit.classList.remove('hidden');
         } else {
-            document.getElementById(`display-mode-${id}`).classList.remove('hidden');
-            document.getElementById(`edit-mode-${id}`).classList.add('hidden');
+            disp.classList.remove('hidden');
+            edit.classList.add('hidden');
         }
     };
 
@@ -1120,10 +1727,26 @@
             const newTimestamp = newDatetimeVal ? Timestamp.fromDate(new Date(newDatetimeVal)) : targetLog.createdAt;
             const rawOverall = document.getElementById(`edit-overall-${id}`).value.trim();
 
+            const editBeanForm = document.getElementById(`edit-beanform-${id}`).value;
+            const editGrindVal = editBeanForm === 'powder'
+                ? document.getElementById(`edit-grind-powder-${id}`).value
+                : document.getElementById(`edit-grind-${id}`).value;
+            const editRoastVal = document.getElementById(`edit-roast-${id}`).value || '';
+
+            const rawMin = document.getElementById(`edit-time-min-${id}`).value.trim();
+            const rawSec = document.getElementById(`edit-time-sec-${id}`).value.trim();
+            let brewTimeSec = null;
+            if (rawMin !== '' || rawSec !== '') {
+                brewTimeSec = (parseInt(rawMin, 10) || 0) * 60 + (parseInt(rawSec, 10) || 0);
+            }
+
             const updatedData = {
                 beansName: document.getElementById(`edit-beans-${id}`).value,
-                grind: document.getElementById(`edit-grind-${id}`).value,
+                beanForm: editBeanForm,
+                roastLevel: editRoastVal,
+                grind: editGrindVal,
                 temp: document.getElementById(`edit-temp-${id}`).value,
+                brewTimeSec: brewTimeSec,
                 notes: document.getElementById(`edit-notes-${id}`).value,
                 ratings: updatedRatings,
                 ratingSum: calcRatingSum(updatedRatings),
@@ -1154,6 +1777,314 @@
         }
     };
 
+    // ==================== 統計ダッシュボード描画 ====================
+    DOM.statsFilterPeriod.addEventListener('change', renderStats);
+    DOM.statsFilterDrink.addEventListener('change', renderStats);
+    DOM.statsFilterTemp.addEventListener('change', renderStats);
+
+    function renderStats() {
+        if (!currentUser) return;
+        const periodVal = DOM.statsFilterPeriod.value;
+        const drinkVal = DOM.statsFilterDrink.value;
+        const tempVal = DOM.statsFilterTemp.value;
+
+        const nowMs = Date.now();
+        const cutoffMs = periodVal === 'all' ? 0 : nowMs - Number(periodVal) * 24 * 60 * 60 * 1000;
+
+        const targetLogs = cloudLogs.filter(log => {
+            const logMs = log.createdAt ? log.createdAt.toMillis() : 0;
+            if (cutoffMs > 0 && logMs < cutoffMs) return false;
+            const r = log.recipe || {};
+            if (drinkVal !== 'all' && (r.drinkType || 'black') !== drinkVal) return false;
+            if (tempVal === 'hot' && r.isIce) return false;
+            if (tempVal === 'ice' && !r.isIce) return false;
+            return true;
+        });
+
+        DOM.statsTargetCount.textContent = `対象: ${targetLogs.length}件`;
+
+        if (targetLogs.length === 0) {
+            DOM.statsKpiGrid.innerHTML = `<div class="col-span-full bg-white rounded-xl p-6 text-center text-sm text-gray-500 border border-gray-100">条件に一致する統計データがありません。</div>`;
+            DOM.statsTrendChart.innerHTML = '';
+            DOM.statsRadarChart.innerHTML = '';
+            DOM.statsAvgSumLabel.textContent = '平均 - / 25点';
+            DOM.statsBeansTable.innerHTML = '';
+            DOM.statsRoastBreakdown.innerHTML = '';
+            DOM.statsFlavorBreakdown.innerHTML = '';
+            DOM.statsTempBreakdown.innerHTML = '';
+            DOM.statsGrindBreakdown.innerHTML = '';
+            return;
+        }
+
+        // 1. KPI集計
+        const totalCount = targetLogs.length;
+        const blackCount = targetLogs.filter(l => (l.recipe?.drinkType || 'black') === 'black').length;
+        const latteCount = totalCount - blackCount;
+        const hotCount = targetLogs.filter(l => !l.recipe?.isIce).length;
+        const iceCount = totalCount - hotCount;
+
+        const totalBeansG = targetLogs.reduce((acc, l) => acc + (Number(l.recipe?.beans) || 0), 0);
+        const avgBeansG = totalBeansG / totalCount;
+
+        const overallScores = targetLogs
+            .map(l => l.overallScore)
+            .filter(v => v !== undefined && v !== null && v !== '' && !isNaN(Number(v)))
+            .map(Number);
+        const avgOverall = overallScores.length > 0 ? (overallScores.reduce((a, b) => a + b, 0) / overallScores.length) : null;
+        const maxOverall = overallScores.length > 0 ? Math.max(...overallScores) : null;
+
+        const avgRatingSum = targetLogs.reduce((acc, l) => acc + calcRatingSum(l.ratings), 0) / totalCount;
+
+        const brewTimes = targetLogs
+            .map(l => l.brewTimeSec)
+            .filter(v => v !== undefined && v !== null && v !== '' && !isNaN(Number(v)))
+            .map(Number);
+        const avgBrewSec = brewTimes.length > 0 ? (brewTimes.reduce((a, b) => a + b, 0) / brewTimes.length) : null;
+
+        const kpiCards = [
+            { label: '総抽出回数', value: `${totalCount}回`, sub: `Black ${blackCount} / Latte ${latteCount}` },
+            { label: 'Hot / Ice 比率', value: `${Math.round((hotCount / totalCount) * 100)}% : ${Math.round((iceCount / totalCount) * 100)}%`, sub: `Hot ${hotCount}回 / Ice ${iceCount}回` },
+            { label: '累計消費豆量', value: `${totalBeansG.toFixed(0)}g`, sub: `平均 ${avgBeansG.toFixed(1)}g / 回` },
+            { label: '平均総合点', value: avgOverall !== null ? `${avgOverall.toFixed(1)}点` : '-', sub: maxOverall !== null ? `最高 ${maxOverall}点 (${overallScores.length}件)` : 'スコア未記録' },
+            { label: '平均5項目合計', value: `${avgRatingSum.toFixed(1)}点`, sub: '25点満点中' },
+            { label: '平均抽出時間', value: avgBrewSec !== null ? formatBrewTime(avgBrewSec) : '-', sub: brewTimes.length > 0 ? `記録済み ${brewTimes.length}件` : '時間未記録' }
+        ];
+
+        DOM.statsKpiGrid.innerHTML = kpiCards.map(k => `
+            <div class="glass-panel rounded-xl p-3.5 border border-gray-100 shadow-sm">
+                <span class="block text-[11px] text-gray-500 font-medium mb-1">${k.label}</span>
+                <span class="block text-lg font-bold text-slate-800">${k.value}</span>
+                <span class="block text-[10px] text-gray-400 mt-0.5">${k.sub}</span>
+            </div>
+        `).join('');
+
+        // 2. 5項目平均レーダーチャート
+        const avgRatings = {};
+        RATING_KEYS.forEach(k => {
+            avgRatings[k.id] = targetLogs.reduce((acc, l) => acc + (Number(l.ratings?.[k.id]) || 0), 0) / totalCount;
+        });
+        DOM.statsAvgSumLabel.textContent = `平均 ${avgRatingSum.toFixed(1)} / 25点`;
+        DOM.statsRadarChart.innerHTML = renderPentagonRadarSVG(avgRatings, 'max-w-[230px]');
+
+        // 3. 総合点推移SVG折れ線グラフ（直近30件を時系列順）
+        const trendLogs = [...targetLogs]
+            .filter(l => l.overallScore !== undefined && l.overallScore !== null && l.overallScore !== '' && !isNaN(Number(l.overallScore)))
+            .slice(0, 30)
+            .reverse();
+
+        if (trendLogs.length < 2) {
+            DOM.statsTrendChart.innerHTML = `<div class="h-44 flex items-center justify-center text-xs text-gray-400">推移グラフの表示には総合点が記録されたログが2件以上必要です。</div>`;
+        } else {
+            const W = 560;
+            const H = 190;
+            const padL = 34;
+            const padR = 16;
+            const padT = 18;
+            const padB = 28;
+            const plotW = W - padL - padR;
+            const plotH = H - padT - padB;
+
+            const scores = trendLogs.map(l => Number(l.overallScore));
+            const minS = Math.max(0, Math.floor((Math.min(...scores) - 5) / 5) * 5);
+            const maxS = Math.min(100, Math.ceil((Math.max(...scores) + 5) / 5) * 5);
+            const rangeS = Math.max(10, maxS - minS);
+
+            const pts = trendLogs.map((l, idx) => {
+                const x = padL + (idx / (trendLogs.length - 1)) * plotW;
+                const y = padT + plotH - ((Number(l.overallScore) - minS) / rangeS) * plotH;
+                const d = l.createdAt ? l.createdAt.toDate() : new Date();
+                const label = `${d.getMonth() + 1}/${d.getDate()}`;
+                return { x, y, score: Number(l.overallScore), label, name: l.beansName };
+            });
+
+            const polylinePts = pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+            const areaPts = `${pts[0].x.toFixed(1)},${padT + plotH} ${polylinePts} ${pts[pts.length - 1].x.toFixed(1)},${padT + plotH}`;
+
+            const gridLines = [0, 0.5, 1].map(ratio => {
+                const val = Math.round(minS + rangeS * ratio);
+                const y = padT + plotH - ratio * plotH;
+                return `
+                    <line x1="${padL}" y1="${y.toFixed(1)}" x2="${W - padR}" y2="${y.toFixed(1)}" stroke="#E2E8F0" stroke-dasharray="3 3" />
+                    <text x="${padL - 6}" y="${(y + 3).toFixed(1)}" text-anchor="end" font-size="10" fill="#94A3B8">${val}</text>
+                `;
+            }).join('');
+
+            const circles = pts.map((p, idx) => {
+                const showX = idx === 0 || idx === pts.length - 1 || idx % Math.ceil(pts.length / 6) === 0;
+                return `
+                    <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="#1E293B" stroke="#FFFFFF" stroke-width="1.5">
+                        <title>${escapeHtml(p.label)} ${escapeHtml(p.name)}: ${p.score}点</title>
+                    </circle>
+                    ${showX ? `<text x="${p.x.toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="9" fill="#64748B">${p.label}</text>` : ''}
+                `;
+            }).join('');
+
+            DOM.statsTrendChart.innerHTML = `
+                <svg viewBox="0 0 ${W} ${H}" class="w-full min-w-[360px] h-auto select-none">
+                    ${gridLines}
+                    <polygon points="${areaPts}" fill="rgba(59, 130, 246, 0.10)" />
+                    <polyline points="${polylinePts}" fill="none" stroke="#3B82F6" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" />
+                    ${circles}
+                </svg>
+            `;
+        }
+
+        // 4. 銘柄別ランキングテーブル
+        const beanMap = new Map();
+        targetLogs.forEach(l => {
+            const key = (l.beansName || '名称未設定').trim();
+            if (!beanMap.has(key)) {
+                beanMap.set(key, { name: key, count: 0, overallList: [], sumList: [], temps: [], grinds: [] });
+            }
+            const item = beanMap.get(key);
+            item.count++;
+            if (l.overallScore !== undefined && l.overallScore !== null && l.overallScore !== '') {
+                item.overallList.push(Number(l.overallScore));
+            }
+            item.sumList.push(calcRatingSum(l.ratings));
+            if (l.temp) item.temps.push(`${l.temp}℃`);
+            if (l.grind) item.grinds.push(formatGrindDisplay(l));
+        });
+
+        const getModeStr = (arr) => {
+            if (!arr.length) return '-';
+            const freq = {};
+            arr.forEach(v => freq[v] = (freq[v] || 0) + 1);
+            return Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0];
+        };
+
+        const beanStats = Array.from(beanMap.values())
+            .map(b => ({
+                ...b,
+                avgOverall: b.overallList.length ? (b.overallList.reduce((a, c) => a + c, 0) / b.overallList.length) : null,
+                avgSum: b.sumList.reduce((a, c) => a + c, 0) / b.count,
+                modeTemp: getModeStr(b.temps),
+                modeGrind: getModeStr(b.grinds)
+            }))
+            .sort((a, b) => (b.avgOverall ?? -1) - (a.avgOverall ?? -1) || b.count - a.count);
+
+        DOM.statsBeansTable.innerHTML = `
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="border-b border-gray-200 text-gray-500">
+                        <th class="py-2 pr-3 font-semibold">豆・銘柄</th>
+                        <th class="py-2 px-2 font-semibold text-right">回数</th>
+                        <th class="py-2 px-2 font-semibold text-right">平均総合点</th>
+                        <th class="py-2 px-2 font-semibold text-right">5項目平均</th>
+                        <th class="py-2 pl-3 font-semibold hidden sm:table-cell">最頻設定 (湯温 / 挽目)</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    ${beanStats.map(b => `
+                        <tr class="hover:bg-slate-50/70">
+                            <td class="py-2.5 pr-3 font-semibold text-gray-800 max-w-[200px] truncate">${escapeHtml(b.name)}</td>
+                            <td class="py-2.5 px-2 text-right text-gray-600">${b.count}回</td>
+                            <td class="py-2.5 px-2 text-right font-bold text-slate-800">${b.avgOverall !== null ? `${b.avgOverall.toFixed(1)}点` : '-'}</td>
+                            <td class="py-2.5 px-2 text-right text-amber-800 font-medium">${b.avgSum.toFixed(1)} / 25</td>
+                            <td class="py-2.5 pl-3 text-gray-500 hidden sm:table-cell">${escapeHtml(b.modeTemp)} / ${escapeHtml(b.modeGrind)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+
+        // 5. 条件別バー表示ヘルパー
+        function renderBreakdownBars(containerEl, groups) {
+            if (groups.length === 0) {
+                containerEl.innerHTML = `<p class="text-xs text-gray-400">データがありません。</p>`;
+                return;
+            }
+            containerEl.innerHTML = groups.map(g => {
+                const avgO = g.overallList.length ? (g.overallList.reduce((a, b) => a + b, 0) / g.overallList.length) : null;
+                const avgS = g.sumList.reduce((a, b) => a + b, 0) / g.count;
+                const barWidth = avgO !== null ? Math.min(100, Math.max(5, avgO)) : Math.min(100, Math.round((avgS / 25) * 100));
+                return `
+                    <div>
+                        <div class="flex justify-between items-center text-xs mb-1">
+                            <span class="font-medium text-gray-700">${escapeHtml(g.label)} <span class="text-gray-400 font-normal">(${g.count}回)</span></span>
+                            <span class="text-gray-600">
+                                総合: <strong class="text-slate-800">${avgO !== null ? `${avgO.toFixed(1)}点` : '-'}</strong>
+                                <span class="text-gray-400 mx-1">|</span>
+                                5項目: <strong class="text-amber-800">${avgS.toFixed(1)}</strong>
+                            </span>
+                        </div>
+                        <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-slate-700 rounded-full" style="width: ${barWidth}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function groupLogsBy(logs, keyFn, orderList = null) {
+            const map = new Map();
+            logs.forEach(l => {
+                const label = keyFn(l);
+                if (!map.has(label)) {
+                    map.set(label, { label, count: 0, overallList: [], sumList: [] });
+                }
+                const g = map.get(label);
+                g.count++;
+                if (l.overallScore !== undefined && l.overallScore !== null && l.overallScore !== '') {
+                    g.overallList.push(Number(l.overallScore));
+                }
+                g.sumList.push(calcRatingSum(l.ratings));
+            });
+            const arr = Array.from(map.values());
+            if (orderList) {
+                arr.sort((a, b) => {
+                    const ia = orderList.indexOf(a.label);
+                    const ib = orderList.indexOf(b.label);
+                    return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+                });
+            } else {
+                arr.sort((a, b) => b.count - a.count);
+            }
+            return arr;
+        }
+
+        // 焙煎度合い別
+        renderBreakdownBars(
+            DOM.statsRoastBreakdown,
+            groupLogsBy(targetLogs, l => l.roastLevel || '未選択', [...ROAST_LEVEL_OPTIONS, '未選択'])
+        );
+
+        // 4:6味調整別
+        const flavorMapLabel = { sweet: '甘味重視 (1投目少なめ)', normal: '通常 (均等)', acidic: '酸味重視 (1投目多め)' };
+        renderBreakdownBars(
+            DOM.statsFlavorBreakdown,
+            groupLogsBy(targetLogs, l => flavorMapLabel[l.recipe?.flavor || 'normal'] || '通常 (均等)')
+        );
+
+        // 湯温帯別
+        renderBreakdownBars(
+            DOM.statsTempBreakdown,
+            groupLogsBy(targetLogs, l => {
+                const t = Number(l.temp);
+                if (isNaN(t)) return '不明';
+                if (t <= 80) return '〜80℃ (低温)';
+                if (t <= 85) return '81〜85℃ (中低温)';
+                if (t <= 90) return '86〜90℃ (中高温)';
+                return '91℃〜 (高温)';
+            }, ['〜80℃ (低温)', '81〜85℃ (中低温)', '86〜90℃ (中高温)', '91℃〜 (高温)', '不明'])
+        );
+
+        // 挽目・状態別
+        renderBreakdownBars(
+            DOM.statsGrindBreakdown,
+            groupLogsBy(targetLogs, l => {
+                const isPowder = l.beanForm === 'powder' || POWDER_GRIND_OPTIONS.includes(String(l.grind));
+                if (isPowder) return `粉: ${l.grind || '中挽き'}`;
+                const c = Number(l.grind);
+                if (isNaN(c)) return `豆: ${l.grind}`;
+                if (c <= 14) return '豆: 〜14 click (細かめ)';
+                if (c <= 18) return '豆: 15〜18 click (標準)';
+                if (c <= 22) return '豆: 19〜22 click (粗め)';
+                return '豆: 23 click〜 (極粗)';
+            })
+        );
+    }
+
     // --- CSV エクスポート ---
     function escapeCsvField(val) {
         if (val === null || val === undefined) return '';
@@ -1175,13 +2106,15 @@
             '抽出日時', '豆の名前', 'ドリンク種類', 'アイス', '味調整',
             '豆量_g', '総量_ml', 'お湯_ml', 'ミルク_ml', '氷_g',
             '挽目', '湯温', '酸味', '甘み', '苦み', 'ボディ', '後味',
-            '5項目合計', '総合点_100点満点', 'メモ'
+            '5項目合計', '総合点_100点満点', 'メモ',
+            '状態_豆or粉', '焙煎度合い', '抽出時間_秒'
         ];
 
         const rows = cloudLogs.map(log => {
             const dt = log.createdAt ? log.createdAt.toDate().toISOString() : '';
             const r = log.recipe || {};
             const rt = log.ratings || {};
+            const isPowder = log.beanForm === 'powder' || POWDER_GRIND_OPTIONS.includes(String(log.grind));
             return [
                 dt,
                 log.beansName || '',
@@ -1202,7 +2135,10 @@
                 rt.aftertaste ?? 3,
                 calcRatingSum(rt),
                 log.overallScore ?? '',
-                log.notes || ''
+                log.notes || '',
+                isPowder ? 'powder' : 'beans',
+                log.roastLevel || '',
+                log.brewTimeSec ?? ''
             ].map(escapeCsvField).join(',');
         });
 
@@ -1313,10 +2249,20 @@
                 const rawOverall = (cols[idx('総合点_100点満点', 18)] ?? '').trim();
                 const overallScore = rawOverall !== '' && !isNaN(Number(rawOverall)) ? Number(rawOverall) : null;
 
+                const grindVal = cols[idx('挽目', 10)] || String(DEFAULT_GRIND);
+                const rawForm = (cols[idx('状態_豆or粉', 20)] ?? '').trim();
+                const beanForm = (rawForm === 'powder' || POWDER_GRIND_OPTIONS.includes(grindVal)) ? 'powder' : 'beans';
+                const roastLevel = (cols[idx('焙煎度合い', 21)] ?? '').trim();
+                const rawBrewSec = (cols[idx('抽出時間_秒', 22)] ?? '').trim();
+                const brewTimeSec = rawBrewSec !== '' && !isNaN(Number(rawBrewSec)) ? Number(rawBrewSec) : null;
+
                 return {
                     beansName: cols[idx('豆の名前', 1)] || '名称未設定',
-                    grind: cols[idx('挽目', 10)] || String(DEFAULT_GRIND),
+                    beanForm: beanForm,
+                    roastLevel: roastLevel,
+                    grind: grindVal,
                     temp: cols[idx('湯温', 11)] || String(DEFAULT_TEMP),
+                    brewTimeSec: brewTimeSec,
                     notes: cols[idx('メモ', 19)] || '',
                     ratings: ratings,
                     ratingSum: calcRatingSum(ratings),
@@ -1370,7 +2316,7 @@
         const bgColor = isError ? 'bg-red-600' : 'bg-slate-800';
         const iconColor = isError ? 'text-white' : 'text-green-400';
         toast.className = `toast-enter ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium flex items-center gap-2`;
-        toast.innerHTML = `<svg class="w-4 h-4 ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> ${message}`;
+        toast.innerHTML = `<svg class="w-4 h-4 ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> ${escapeHtml(message)}`;
         document.getElementById('toast-container').appendChild(toast);
         setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s ease'; setTimeout(() => toast.remove(), 300); }, 3000);
     }
