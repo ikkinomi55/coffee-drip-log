@@ -81,7 +81,7 @@
 </div>
 
 <!-- アプリ本体 -->
-<main id="app-main-container" class="hidden max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-7">
+<main id="app-main-container" class="hidden max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
     
     <!-- ==================== タブ1：計算＆登録フォーム（PC 1画面集約・ゆったりレイアウト） ==================== -->
     <section id="tab-content-record" class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
@@ -173,117 +173,122 @@
 
         <!-- 右ペイン：Save to Log -->
         <div class="lg:col-span-7 glass-panel rounded-2xl shadow-sm p-5 sm:p-6 lg:p-7 border border-gray-100 flex flex-col justify-between">
-            <div>
+            <div class="flex flex-col h-full">
                 <h2 class="text-base sm:text-lg font-bold mb-4 pb-2.5 border-b flex items-center gap-2 text-slate-800">
                     <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                     Save to Log
                 </h2>
-                <form id="log-form" class="space-y-4">
-                    <!-- 行1：豆の種類・銘柄 & 抽出日時 -->
-                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
-                        <div class="sm:col-span-7">
-                            <label class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">豆の種類・銘柄</label>
-                            <input type="text" id="log-beans-name" list="beans-list" placeholder="例: 澤井珈琲 エチオピア" required class="w-full rounded-lg border-gray-300 shadow-sm px-3.5 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm">
-                            <datalist id="beans-list"></datalist>
-                        </div>
-                        <div class="sm:col-span-5">
-                            <label class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">抽出日時 (空欄で現在時刻)</label>
-                            <input type="datetime-local" id="log-datetime" class="w-full rounded-lg border-gray-300 shadow-sm px-3 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm">
-                        </div>
-                    </div>
-
-                    <!-- 行2：購入時の状態（豆／粉） & 焙煎度合い -->
-                    <div class="grid grid-cols-2 gap-3.5">
-                        <div>
-                            <label class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">購入時の状態</label>
-                            <div class="flex rounded-lg shadow-sm" role="group">
-                                <button type="button" id="btn-form-beans" class="flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-l-lg border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors">豆</button>
-                                <button type="button" id="btn-form-powder" class="flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-r-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors">粉</button>
+                <form id="log-form" class="space-y-4 flex-1 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <!-- 行1：豆の種類・銘柄 & 抽出日時 -->
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+                            <div class="sm:col-span-7">
+                                <label class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">豆の種類・銘柄</label>
+                                <input type="text" id="log-beans-name" list="beans-list" placeholder="例: 澤井珈琲 エチオピア" required class="w-full rounded-lg border-gray-300 shadow-sm px-3.5 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm">
+                                <datalist id="beans-list"></datalist>
+                            </div>
+                            <div class="sm:col-span-5">
+                                <label class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">抽出日時 (空欄で現在時刻)</label>
+                                <input type="datetime-local" id="log-datetime" class="w-full rounded-lg border-gray-300 shadow-sm px-3 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm">
                             </div>
                         </div>
-                        <div>
-                            <label for="log-roast" class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">焙煎度合い</label>
-                            <select id="log-roast" class="w-full rounded-lg border-gray-300 shadow-sm px-3.5 py-2.5 border bg-white focus:ring-slate-500 focus:border-slate-500 text-sm text-gray-700">
-                                <option value="">未選択</option>
-                                <option value="極浅煎り">極浅煎り</option>
-                                <option value="浅煎り">浅煎り</option>
-                                <option value="中煎り">中煎り</option>
-                                <option value="中深煎り">中深煎り</option>
-                                <option value="深煎り">深煎り</option>
-                                <option value="極深煎り">極深煎り</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <!-- 行3：挽目・湯温・抽出時間の3項目を1ブロック（横1列・各1ボックス）に集約 -->
-                    <div class="grid grid-cols-3 gap-3.5">
-                        <!-- 挽目（1ボックス：手入力＋リスト選択） -->
-                        <div class="relative combo-box-wrapper">
-                            <label id="log-grind-label" for="log-grind" class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5 truncate">挽目 (C3)</label>
-                            <div class="relative">
-                                <input type="text" id="log-grind" value="18" inputmode="decimal" autocomplete="off" required class="w-full rounded-lg border-gray-300 shadow-sm pl-3.5 pr-8 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base font-semibold">
-                                <button type="button" tabindex="-1" data-combo-toggle="grind-dropdown" class="absolute inset-y-0 right-0 px-2.5 flex items-center text-gray-400 hover:text-gray-600" aria-label="挽目リストを開く">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </button>
-                            </div>
-                            <div id="grind-dropdown" class="combo-dropdown hidden absolute z-30 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg py-1 text-xs sm:text-sm"></div>
-                        </div>
 
-                        <!-- 湯温（1ボックス：手入力＋リスト選択） -->
-                        <div class="relative combo-box-wrapper">
-                            <label for="log-temp" class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5 truncate">湯温 (℃)</label>
-                            <div class="relative">
-                                <input type="text" id="log-temp" value="83" inputmode="decimal" autocomplete="off" required class="w-full rounded-lg border-gray-300 shadow-sm pl-3.5 pr-8 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base font-semibold">
-                                <button type="button" tabindex="-1" data-combo-toggle="temp-dropdown" class="absolute inset-y-0 right-0 px-2.5 flex items-center text-gray-400 hover:text-gray-600" aria-label="湯温リストを開く">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </button>
-                            </div>
-                            <div id="temp-dropdown" class="combo-dropdown hidden absolute z-30 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg py-1 text-xs sm:text-sm"></div>
-                        </div>
-
-                        <!-- 抽出時間 mm:ss（1ボックス：手入力＋リスト選択） -->
-                        <div class="relative combo-box-wrapper">
-                            <label for="log-brew-time" class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5 truncate">抽出時間 (mm:ss)</label>
-                            <div class="relative">
-                                <input type="text" id="log-brew-time" placeholder="2:30" inputmode="numeric" autocomplete="off" class="w-full rounded-lg border-gray-300 shadow-sm pl-3.5 pr-8 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base font-semibold">
-                                <button type="button" tabindex="-1" data-combo-toggle="time-dropdown" class="absolute inset-y-0 right-0 px-2.5 flex items-center text-gray-400 hover:text-gray-600" aria-label="抽出時間リストを開く">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </button>
-                            </div>
-                            <div id="time-dropdown" class="combo-dropdown hidden absolute z-30 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg py-1 text-xs sm:text-sm"></div>
-                        </div>
-                    </div>
-
-                    <!-- 行4：味わい評価（2列ゆとり配置） -->
-                    <div class="bg-slate-50/80 rounded-xl p-3.5 sm:p-4 border border-gray-200/80">
-                        <div class="flex items-center justify-between mb-2.5 pb-1.5 border-b border-gray-200/70">
-                            <label class="block text-xs sm:text-sm font-semibold text-gray-700">味わい評価 (1-5)</label>
-                            <div class="bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs font-bold text-amber-800">
-                                5項目合計: <span id="new-rating-sum" class="text-sm text-amber-900">15</span> / 25点
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5" id="rating-inputs-container"></div>
-                    </div>
-
-                    <!-- 行5：総合点 & メモ -->
-                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 items-stretch">
-                        <div class="sm:col-span-5 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-200 flex items-center justify-between gap-2">
+                        <!-- 行2：購入時の状態（豆／粉） & 焙煎度合い -->
+                        <div class="grid grid-cols-2 gap-3.5">
                             <div>
-                                <label for="log-overall-score" class="block text-xs sm:text-sm font-bold text-slate-800">総合点</label>
-                                <span class="text-[11px] text-gray-500">100点満点</span>
+                                <label class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">購入時の状態</label>
+                                <div class="flex rounded-lg shadow-sm" role="group">
+                                    <button type="button" id="btn-form-beans" class="flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-l-lg border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors">豆</button>
+                                    <button type="button" id="btn-form-powder" class="flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-r-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors">粉</button>
+                                </div>
                             </div>
-                            <div class="flex items-center gap-1.5">
-                                <input type="number" id="log-overall-score" min="0" max="100" step="1" placeholder="85" inputmode="numeric" class="w-20 text-right rounded-lg border-gray-300 shadow-sm px-2.5 py-1.5 border focus:ring-slate-500 focus:border-slate-500 text-base font-bold text-slate-900">
-                                <span class="text-xs sm:text-sm font-medium text-gray-600">点</span>
+                            <div>
+                                <label for="log-roast" class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">焙煎度合い</label>
+                                <select id="log-roast" class="w-full rounded-lg border-gray-300 shadow-sm px-3.5 py-2.5 border bg-white focus:ring-slate-500 focus:border-slate-500 text-sm text-gray-700">
+                                    <option value="">未選択</option>
+                                    <option value="極浅煎り">極浅煎り</option>
+                                    <option value="浅煎り">浅煎り</option>
+                                    <option value="中煎り">中煎り</option>
+                                    <option value="中深煎り">中深煎り</option>
+                                    <option value="深煎り">深煎り</option>
+                                    <option value="極深煎り">極深煎り</option>
+                                </select>
                             </div>
                         </div>
-                        <div class="sm:col-span-7 flex flex-col justify-center">
-                            <label for="log-notes" class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">メモ (オプション)</label>
-                            <input type="text" id="log-notes" placeholder="気づきや豆の状態など" class="w-full rounded-lg border-gray-300 shadow-sm px-3.5 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm">
+                        
+                        <!-- 行3：挽目・湯温・抽出時間の3項目を1ブロック（横1列・各1ボックス）に集約 -->
+                        <div class="grid grid-cols-3 gap-3.5">
+                            <!-- 挽目（1ボックス：手入力＋リスト選択） -->
+                            <div class="relative combo-box-wrapper">
+                                <label id="log-grind-label" for="log-grind" class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5 truncate">挽目 (C3)</label>
+                                <div class="relative">
+                                    <input type="text" id="log-grind" value="18" inputmode="decimal" autocomplete="off" required class="w-full rounded-lg border-gray-300 shadow-sm pl-3.5 pr-8 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base font-semibold">
+                                    <button type="button" tabindex="-1" data-combo-toggle="grind-dropdown" class="absolute inset-y-0 right-0 px-2.5 flex items-center text-gray-400 hover:text-gray-600" aria-label="挽目リストを開く">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                </div>
+                                <div id="grind-dropdown" class="combo-dropdown hidden absolute z-30 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg py-1 text-xs sm:text-sm"></div>
+                            </div>
+
+                            <!-- 湯温（1ボックス：手入力＋リスト選択） -->
+                            <div class="relative combo-box-wrapper">
+                                <label for="log-temp" class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5 truncate">湯温 (℃)</label>
+                                <div class="relative">
+                                    <input type="text" id="log-temp" value="83" inputmode="decimal" autocomplete="off" required class="w-full rounded-lg border-gray-300 shadow-sm pl-3.5 pr-8 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base font-semibold">
+                                    <button type="button" tabindex="-1" data-combo-toggle="temp-dropdown" class="absolute inset-y-0 right-0 px-2.5 flex items-center text-gray-400 hover:text-gray-600" aria-label="湯温リストを開く">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                </div>
+                                <div id="temp-dropdown" class="combo-dropdown hidden absolute z-30 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg py-1 text-xs sm:text-sm"></div>
+                            </div>
+
+                            <!-- 抽出時間 mm:ss（1ボックス：手入力＋リスト選択） -->
+                            <div class="relative combo-box-wrapper">
+                                <label for="log-brew-time" class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5 truncate">抽出時間 (mm:ss)</label>
+                                <div class="relative">
+                                    <input type="text" id="log-brew-time" placeholder="2:30" inputmode="numeric" autocomplete="off" class="w-full rounded-lg border-gray-300 shadow-sm pl-3.5 pr-8 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base font-semibold">
+                                    <button type="button" tabindex="-1" data-combo-toggle="time-dropdown" class="absolute inset-y-0 right-0 px-2.5 flex items-center text-gray-400 hover:text-gray-600" aria-label="抽出時間リストを開く">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </button>
+                                </div>
+                                <div id="time-dropdown" class="combo-dropdown hidden absolute z-30 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg py-1 text-xs sm:text-sm"></div>
+                            </div>
+                        </div>
+
+                        <!-- 行4：左に味わい評価（縦5項目）、右に総合点＋メモを2分割配置 -->
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-stretch">
+                            <!-- 左側：味わい評価（縦1列・5項目） -->
+                            <div class="sm:col-span-6 bg-slate-50/80 rounded-xl p-3.5 sm:p-4 border border-gray-200/80 flex flex-col justify-between">
+                                <div class="flex items-center justify-between mb-2.5 pb-2 border-b border-gray-200/70">
+                                    <label class="block text-xs sm:text-sm font-semibold text-gray-700">味わい評価 (1-5)</label>
+                                    <div class="bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs font-bold text-amber-800">
+                                        合計: <span id="new-rating-sum" class="text-sm text-amber-900">15</span> / 25点
+                                    </div>
+                                </div>
+                                <div class="space-y-2.5 flex-1 flex flex-col justify-center" id="rating-inputs-container"></div>
+                            </div>
+
+                            <!-- 右側：総合点 & メモ -->
+                            <div class="sm:col-span-6 flex flex-col gap-3.5 justify-between">
+                                <div class="bg-slate-50 px-4 py-3 rounded-xl border border-slate-200 flex items-center justify-between gap-2">
+                                    <div>
+                                        <label for="log-overall-score" class="block text-xs sm:text-sm font-bold text-slate-800">総合点</label>
+                                        <span class="text-[11px] text-gray-500">100点満点</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <input type="number" id="log-overall-score" min="0" max="100" step="1" placeholder="85" inputmode="numeric" class="w-20 text-right rounded-lg border-gray-300 shadow-sm px-2.5 py-1.5 border focus:ring-slate-500 focus:border-slate-500 text-base font-bold text-slate-900">
+                                        <span class="text-xs sm:text-sm font-medium text-gray-600">点</span>
+                                    </div>
+                                </div>
+                                <div class="flex-1 flex flex-col">
+                                    <label for="log-notes" class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">メモ (オプション)</label>
+                                    <textarea id="log-notes" rows="3" placeholder="気づきや豆の状態、抽出の感想など" class="w-full flex-1 rounded-lg border-gray-300 shadow-sm px-3.5 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm resize-none"></textarea>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- 行6：保存ボタン -->
+                    <!-- 行5：保存ボタン -->
                     <div class="pt-1">
                         <button type="submit" id="btn-submit" class="w-full bg-slate-900 text-white font-semibold py-3 rounded-xl shadow-md hover:bg-slate-800 active:scale-[0.99] transition-all text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed">
                             クラウドに記録を保存する
@@ -1156,7 +1161,7 @@
     function generateRatingUI(prefix, defaultValues = {}, compact = false) {
         const btnSize = compact ? 'w-6 h-6 text-xs' : 'w-7 h-7 sm:w-8 sm:h-8 text-xs sm:text-sm';
         const labelClass = compact ? 'text-xs font-medium text-gray-600 w-11' : 'text-xs sm:text-sm font-medium text-gray-700 w-14';
-        const gapClass = compact ? 'gap-1' : 'gap-1.5';
+        const gapClass = compact ? 'gap-1' : 'gap-1.5 sm:gap-2';
         return RATING_KEYS.map(item => {
             const val = defaultValues[item.id] || 3; 
             const buttons = [1, 2, 3, 4, 5].map(num => `
