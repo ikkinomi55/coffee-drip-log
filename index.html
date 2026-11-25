@@ -24,32 +24,32 @@
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" href="./favicon.ico" sizes="any">
 </head>
-<body class="text-gray-800 antialiased min-h-screen pb-20 sm:pb-4">
+<body class="text-gray-800 antialiased min-h-screen pb-20 sm:pb-6">
 
 <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40">
-    <div class="max-w-6xl mx-auto px-4 flex justify-between items-center h-12 sm:h-13">
-        <div class="flex items-center gap-6 h-full min-w-0">
-            <h1 class="text-base sm:text-lg font-bold flex items-center gap-1.5 shrink-0">
-                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-14 sm:h-16">
+        <div class="flex items-center gap-8 h-full min-w-0">
+            <h1 class="text-lg sm:text-xl font-bold flex items-center gap-2 shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 BrewLog <span class="text-xs text-blue-300 font-normal mt-0.5">4:6</span>
             </h1>
             <!-- PC・タブレット幅(sm以上)のみ表示するヘッダータブ -->
-            <nav id="desktop-nav" class="hidden space-x-3 h-full" aria-label="Tabs">
-                <button onclick="switchTab('record')" id="tab-btn-record" class="border-b-2 border-blue-400 text-blue-400 px-2.5 h-full flex items-center text-sm font-medium transition-colors whitespace-nowrap">記録</button>
-                <button onclick="switchTab('history')" id="tab-btn-history" class="border-b-2 border-transparent text-slate-400 hover:text-slate-300 px-2.5 h-full flex items-center text-sm font-medium transition-colors whitespace-nowrap">履歴・検索</button>
-                <button onclick="switchTab('stats')" id="tab-btn-stats" class="border-b-2 border-transparent text-slate-400 hover:text-slate-300 px-2.5 h-full flex items-center text-sm font-medium transition-colors whitespace-nowrap">統計</button>
+            <nav id="desktop-nav" class="hidden space-x-4 h-full" aria-label="Tabs">
+                <button onclick="switchTab('record')" id="tab-btn-record" class="border-b-2 border-blue-400 text-blue-400 px-3 h-full flex items-center text-sm font-medium transition-colors whitespace-nowrap">記録</button>
+                <button onclick="switchTab('history')" id="tab-btn-history" class="border-b-2 border-transparent text-slate-400 hover:text-slate-300 px-3 h-full flex items-center text-sm font-medium transition-colors whitespace-nowrap">履歴・検索</button>
+                <button onclick="switchTab('stats')" id="tab-btn-stats" class="border-b-2 border-transparent text-slate-400 hover:text-slate-300 px-3 h-full flex items-center text-sm font-medium transition-colors whitespace-nowrap">統計</button>
             </nav>
         </div>
 
-        <div id="header-auth-area" class="hidden items-center gap-2.5 shrink-0">
+        <div id="header-auth-area" class="hidden items-center gap-3 shrink-0">
             <div class="text-xs text-green-400 font-semibold flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
                 <span class="hidden lg:inline">Cloud Sync</span>
             </div>
-            <div class="flex items-center gap-2">
-                <img id="user-avatar" src="" alt="User" class="w-6 h-6 rounded-full border border-slate-600 hidden">
-                <span id="user-name" class="text-xs text-slate-300 hidden md:inline max-w-[130px] truncate"></span>
-                <button type="button" id="btn-logout" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-2 py-1 rounded border border-slate-700 transition-colors whitespace-nowrap">
+            <div class="flex items-center gap-2.5">
+                <img id="user-avatar" src="" alt="User" class="w-7 h-7 rounded-full border border-slate-600 hidden">
+                <span id="user-name" class="text-xs sm:text-sm text-slate-300 hidden md:inline max-w-[150px] truncate"></span>
+                <button type="button" id="btn-logout" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded border border-slate-700 transition-colors whitespace-nowrap">
                     ログアウト
                 </button>
             </div>
@@ -81,46 +81,46 @@
 </div>
 
 <!-- アプリ本体 -->
-<main id="app-main-container" class="hidden max-w-6xl mx-auto px-4 py-3 lg:py-3.5">
+<main id="app-main-container" class="hidden max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-7">
     
-    <!-- ==================== タブ1：計算＆登録フォーム（PC 1画面集約レイアウト） ==================== -->
-    <section id="tab-content-record" class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+    <!-- ==================== タブ1：計算＆登録フォーム（PC 1画面集約・ゆったりレイアウト） ==================== -->
+    <section id="tab-content-record" class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
         
         <!-- 左ペイン：Recipe Calculator -->
-        <div class="lg:col-span-5 glass-panel rounded-2xl shadow-sm p-3.5 sm:p-4 border border-gray-100 flex flex-col justify-between">
-            <div>
-                <h2 class="text-base font-semibold mb-2.5 pb-1.5 border-b flex items-center gap-1.5 text-slate-800">
-                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+        <div class="lg:col-span-5 glass-panel rounded-2xl shadow-sm p-5 sm:p-6 lg:p-7 border border-gray-100 flex flex-col justify-between">
+            <div class="flex flex-col h-full">
+                <h2 class="text-base sm:text-lg font-bold mb-4 pb-2.5 border-b flex items-center gap-2 text-slate-800">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                     Recipe Calculator
                 </h2>
-                <div class="space-y-2.5">
-                    <!-- 種類 & 計算基準（1行集約） -->
-                    <div class="grid grid-cols-2 gap-2.5">
+                <div class="space-y-4 flex-1 flex flex-col">
+                    <!-- 種類 & 計算基準 -->
+                    <div class="grid grid-cols-2 gap-3.5">
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1">種類</label>
-                            <div class="flex rounded-md shadow-sm" role="group">
-                                <button type="button" id="btn-drink-black" class="flex-1 px-2 py-1.5 text-xs font-medium rounded-l-lg border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors">ブラック</button>
-                                <button type="button" id="btn-drink-latte" class="flex-1 px-2 py-1.5 text-xs font-medium rounded-r-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors">カフェラテ</button>
+                            <label class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">種類</label>
+                            <div class="flex rounded-lg shadow-sm" role="group">
+                                <button type="button" id="btn-drink-black" class="flex-1 px-3 py-2.5 text-xs sm:text-sm font-medium rounded-l-lg border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors">ブラック</button>
+                                <button type="button" id="btn-drink-latte" class="flex-1 px-3 py-2.5 text-xs sm:text-sm font-medium rounded-r-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors">カフェラテ</button>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1">計算基準</label>
-                            <div class="flex rounded-md shadow-sm" role="group">
-                                <button type="button" id="btn-type-beans" class="flex-1 px-2 py-1.5 text-xs font-medium rounded-l-lg border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors">豆量 (g)</button>
-                                <button type="button" id="btn-type-yield" class="flex-1 px-2 py-1.5 text-xs font-medium rounded-r-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors">総量 (ml)</button>
+                            <label class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">計算基準</label>
+                            <div class="flex rounded-lg shadow-sm" role="group">
+                                <button type="button" id="btn-type-beans" class="flex-1 px-3 py-2.5 text-xs sm:text-sm font-medium rounded-l-lg border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors">豆量 (g)</button>
+                                <button type="button" id="btn-type-yield" class="flex-1 px-3 py-2.5 text-xs sm:text-sm font-medium rounded-r-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors">総量 (ml)</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 基準量 & アイス切替（1行集約） -->
-                    <div class="grid grid-cols-12 gap-2.5 items-end">
+                    <!-- 基準量 & アイス切替 -->
+                    <div class="grid grid-cols-12 gap-3.5 items-end">
                         <div class="col-span-7">
-                            <label id="input-label" class="block text-xs font-medium text-gray-600 mb-1">豆の量 (g)</label>
-                            <input type="number" id="base-amount" value="15" min="1" class="w-full rounded-md border-gray-300 shadow-sm px-3 py-1.5 border focus:ring-slate-500 focus:border-slate-500 text-sm font-semibold">
+                            <label id="input-label" class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">豆の量 (g)</label>
+                            <input type="number" id="base-amount" value="15" min="1" class="w-full rounded-lg border-gray-300 shadow-sm px-3.5 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base font-semibold">
                         </div>
-                        <div class="col-span-5 flex items-center justify-between bg-slate-50 border border-gray-200 rounded-md px-2.5 py-1.5 h-[34px]">
-                            <span class="text-xs font-medium text-gray-700">アイス (氷)</span>
-                            <div class="relative inline-block w-9 align-middle select-none">
+                        <div class="col-span-5 flex items-center justify-between bg-slate-50 border border-gray-200 rounded-lg px-3.5 py-2.5 h-[44px] sm:h-[46px]">
+                            <span class="text-xs sm:text-sm font-medium text-gray-700">アイス (氷)</span>
+                            <div class="relative inline-block w-10 align-middle select-none">
                                 <input type="checkbox" id="is-ice-toggle" class="toggle-checkbox absolute block w-4 h-4 top-0.5 rounded-full bg-white border-2 border-gray-300 appearance-none cursor-pointer transition-transform duration-200 ease-in-out z-10"/>
                                 <label for="is-ice-toggle" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer transition-colors duration-200 ease-in-out"></label>
                             </div>
@@ -129,40 +129,42 @@
 
                     <!-- 味の調整 -->
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">味の調整 (1, 2投目)</label>
-                        <div class="flex rounded-md shadow-sm" role="group">
-                            <button type="button" id="btn-flavor-sweet" class="flex-1 px-3 py-1.5 text-xs font-medium rounded-l-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors">甘味</button>
-                            <button type="button" id="btn-flavor-normal" class="flex-1 px-3 py-1.5 text-xs font-medium border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors">通常</button>
-                            <button type="button" id="btn-flavor-acidic" class="flex-1 px-3 py-1.5 text-xs font-medium rounded-r-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors">酸味</button>
+                        <label class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">味の調整 (1, 2投目)</label>
+                        <div class="flex rounded-lg shadow-sm" role="group">
+                            <button type="button" id="btn-flavor-sweet" class="flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-l-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors">甘味</button>
+                            <button type="button" id="btn-flavor-normal" class="flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors">通常</button>
+                            <button type="button" id="btn-flavor-acidic" class="flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-r-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors">酸味</button>
                         </div>
                     </div>
 
                     <!-- 計算結果パネル -->
-                    <div id="recipe-result" class="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                        <div class="grid grid-cols-2 gap-2.5 mb-2">
-                            <div class="bg-white py-2 px-2.5 rounded-lg shadow-sm text-center">
-                                <span class="block text-[11px] text-gray-500">必要な豆</span>
-                                <span id="res-beans" class="text-lg font-bold text-slate-800">0g</span>
-                            </div>
-                            <div class="bg-white py-2 px-2.5 rounded-lg shadow-sm text-center">
-                                <span class="block text-[11px] text-gray-500">ドリンク総量</span>
-                                <span id="res-water" class="text-lg font-bold text-slate-800">0ml</span>
-                            </div>
-                        </div>
-                        <div id="milk-section" class="mb-2 bg-orange-50 py-1.5 px-2.5 rounded-lg flex items-center justify-between hidden border border-orange-100">
-                            <span class="text-xs text-orange-700 font-medium">追加するミルク</span>
-                            <span id="res-milk" class="text-sm font-bold text-orange-800">0ml</span>
-                        </div>
-                        <div id="ice-section" class="mb-2 bg-blue-50 py-1.5 px-2.5 rounded-lg flex items-center justify-between hidden border border-blue-100">
-                            <span class="text-xs text-blue-700 font-medium">サーバーにセットする氷</span>
-                            <span id="res-ice" class="text-sm font-bold text-blue-800">0g</span>
-                        </div>
+                    <div id="recipe-result" class="bg-slate-50 rounded-xl p-4 sm:p-5 border border-slate-100 flex-1 flex flex-col justify-between">
                         <div>
-                            <h4 class="text-xs font-bold text-gray-700 flex justify-between mb-1">
+                            <div class="grid grid-cols-2 gap-3.5 mb-3.5">
+                                <div class="bg-white py-3 px-3 rounded-xl shadow-sm text-center">
+                                    <span class="block text-xs text-gray-500 mb-0.5">必要な豆</span>
+                                    <span id="res-beans" class="text-xl sm:text-2xl font-bold text-slate-800">0g</span>
+                                </div>
+                                <div class="bg-white py-3 px-3 rounded-xl shadow-sm text-center">
+                                    <span class="block text-xs text-gray-500 mb-0.5">ドリンク総量</span>
+                                    <span id="res-water" class="text-xl sm:text-2xl font-bold text-slate-800">0ml</span>
+                                </div>
+                            </div>
+                            <div id="milk-section" class="mb-3 bg-orange-50 py-2 px-3.5 rounded-lg flex items-center justify-between hidden border border-orange-100">
+                                <span class="text-xs sm:text-sm text-orange-700 font-medium">追加するミルク</span>
+                                <span id="res-milk" class="text-sm sm:text-base font-bold text-orange-800">0ml</span>
+                            </div>
+                            <div id="ice-section" class="mb-3 bg-blue-50 py-2 px-3.5 rounded-lg flex items-center justify-between hidden border border-blue-100">
+                                <span class="text-xs sm:text-sm text-blue-700 font-medium">サーバーにセットする氷</span>
+                                <span id="res-ice" class="text-sm sm:text-base font-bold text-blue-800">0g</span>
+                            </div>
+                        </div>
+                        <div class="mt-1">
+                            <h4 class="text-xs sm:text-sm font-bold text-gray-700 flex justify-between mb-2">
                                 <span>注湯スケジュール</span>
-                                <span id="res-hot-water" class="text-[11px] text-gray-500 font-normal">お湯: 0ml</span>
+                                <span id="res-hot-water" class="text-xs text-gray-500 font-normal">お湯: 0ml</span>
                             </h4>
-                            <ul id="pour-list" class="text-xs space-y-0.5"></ul>
+                            <ul id="pour-list" class="text-xs sm:text-sm space-y-1.5"></ul>
                         </div>
                     </div>
                 </div>
@@ -170,38 +172,38 @@
         </div>
 
         <!-- 右ペイン：Save to Log -->
-        <div class="lg:col-span-7 glass-panel rounded-2xl shadow-sm p-3.5 sm:p-4 border border-gray-100 flex flex-col justify-between">
+        <div class="lg:col-span-7 glass-panel rounded-2xl shadow-sm p-5 sm:p-6 lg:p-7 border border-gray-100 flex flex-col justify-between">
             <div>
-                <h2 class="text-base font-semibold mb-2.5 pb-1.5 border-b flex items-center gap-1.5 text-slate-800">
-                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                <h2 class="text-base sm:text-lg font-bold mb-4 pb-2.5 border-b flex items-center gap-2 text-slate-800">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                     Save to Log
                 </h2>
-                <form id="log-form" class="space-y-2.5">
+                <form id="log-form" class="space-y-4">
                     <!-- 行1：豆の種類・銘柄 & 抽出日時 -->
-                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
                         <div class="sm:col-span-7">
-                            <label class="block text-xs font-medium text-gray-600 mb-1">豆の種類・銘柄</label>
-                            <input type="text" id="log-beans-name" list="beans-list" placeholder="例: 澤井珈琲 エチオピア" required class="w-full rounded-md border-gray-300 shadow-sm px-3 py-1.5 border focus:ring-slate-500 focus:border-slate-500 text-sm">
+                            <label class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">豆の種類・銘柄</label>
+                            <input type="text" id="log-beans-name" list="beans-list" placeholder="例: 澤井珈琲 エチオピア" required class="w-full rounded-lg border-gray-300 shadow-sm px-3.5 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm">
                             <datalist id="beans-list"></datalist>
                         </div>
                         <div class="sm:col-span-5">
-                            <label class="block text-xs font-medium text-gray-600 mb-1">抽出日時 (空欄で現在時刻)</label>
-                            <input type="datetime-local" id="log-datetime" class="w-full rounded-md border-gray-300 shadow-sm px-2.5 py-1.5 border focus:ring-slate-500 focus:border-slate-500 text-xs sm:text-sm">
+                            <label class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">抽出日時 (空欄で現在時刻)</label>
+                            <input type="datetime-local" id="log-datetime" class="w-full rounded-lg border-gray-300 shadow-sm px-3 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm">
                         </div>
                     </div>
 
                     <!-- 行2：購入時の状態（豆／粉） & 焙煎度合い -->
-                    <div class="grid grid-cols-2 gap-2.5">
+                    <div class="grid grid-cols-2 gap-3.5">
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1">購入時の状態</label>
-                            <div class="flex rounded-md shadow-sm" role="group">
-                                <button type="button" id="btn-form-beans" class="flex-1 px-3 py-1.5 text-xs font-medium rounded-l-lg border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors">豆</button>
-                                <button type="button" id="btn-form-powder" class="flex-1 px-3 py-1.5 text-xs font-medium rounded-r-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors">粉</button>
+                            <label class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">購入時の状態</label>
+                            <div class="flex rounded-lg shadow-sm" role="group">
+                                <button type="button" id="btn-form-beans" class="flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-l-lg border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors">豆</button>
+                                <button type="button" id="btn-form-powder" class="flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium rounded-r-lg border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors">粉</button>
                             </div>
                         </div>
                         <div>
-                            <label for="log-roast" class="block text-xs font-medium text-gray-600 mb-1">焙煎度合い</label>
-                            <select id="log-roast" class="w-full rounded-md border-gray-300 shadow-sm px-2.5 py-1.5 border bg-white focus:ring-slate-500 focus:border-slate-500 text-xs sm:text-sm text-gray-700">
+                            <label for="log-roast" class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">焙煎度合い</label>
+                            <select id="log-roast" class="w-full rounded-lg border-gray-300 shadow-sm px-3.5 py-2.5 border bg-white focus:ring-slate-500 focus:border-slate-500 text-sm text-gray-700">
                                 <option value="">未選択</option>
                                 <option value="極浅煎り">極浅煎り</option>
                                 <option value="浅煎り">浅煎り</option>
@@ -214,77 +216,79 @@
                     </div>
                     
                     <!-- 行3：挽目・湯温・抽出時間の3項目を1ブロック（横1列・各1ボックス）に集約 -->
-                    <div class="grid grid-cols-3 gap-2.5">
+                    <div class="grid grid-cols-3 gap-3.5">
                         <!-- 挽目（1ボックス：手入力＋リスト選択） -->
                         <div class="relative combo-box-wrapper">
-                            <label id="log-grind-label" for="log-grind" class="block text-xs font-medium text-gray-600 mb-1 truncate">挽目 (C3)</label>
+                            <label id="log-grind-label" for="log-grind" class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5 truncate">挽目 (C3)</label>
                             <div class="relative">
-                                <input type="text" id="log-grind" value="18" inputmode="decimal" autocomplete="off" required class="w-full rounded-md border-gray-300 shadow-sm pl-2.5 pr-7 py-1.5 border focus:ring-slate-500 focus:border-slate-500 text-sm font-semibold">
-                                <button type="button" tabindex="-1" data-combo-toggle="grind-dropdown" class="absolute inset-y-0 right-0 px-2 flex items-center text-gray-400 hover:text-gray-600" aria-label="挽目リストを開く">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <input type="text" id="log-grind" value="18" inputmode="decimal" autocomplete="off" required class="w-full rounded-lg border-gray-300 shadow-sm pl-3.5 pr-8 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base font-semibold">
+                                <button type="button" tabindex="-1" data-combo-toggle="grind-dropdown" class="absolute inset-y-0 right-0 px-2.5 flex items-center text-gray-400 hover:text-gray-600" aria-label="挽目リストを開く">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </button>
                             </div>
-                            <div id="grind-dropdown" class="combo-dropdown hidden absolute z-30 mt-1 w-full max-h-44 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg py-1 text-xs"></div>
+                            <div id="grind-dropdown" class="combo-dropdown hidden absolute z-30 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg py-1 text-xs sm:text-sm"></div>
                         </div>
 
                         <!-- 湯温（1ボックス：手入力＋リスト選択） -->
                         <div class="relative combo-box-wrapper">
-                            <label for="log-temp" class="block text-xs font-medium text-gray-600 mb-1 truncate">湯温 (℃)</label>
+                            <label for="log-temp" class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5 truncate">湯温 (℃)</label>
                             <div class="relative">
-                                <input type="text" id="log-temp" value="83" inputmode="decimal" autocomplete="off" required class="w-full rounded-md border-gray-300 shadow-sm pl-2.5 pr-7 py-1.5 border focus:ring-slate-500 focus:border-slate-500 text-sm font-semibold">
-                                <button type="button" tabindex="-1" data-combo-toggle="temp-dropdown" class="absolute inset-y-0 right-0 px-2 flex items-center text-gray-400 hover:text-gray-600" aria-label="湯温リストを開く">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <input type="text" id="log-temp" value="83" inputmode="decimal" autocomplete="off" required class="w-full rounded-lg border-gray-300 shadow-sm pl-3.5 pr-8 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base font-semibold">
+                                <button type="button" tabindex="-1" data-combo-toggle="temp-dropdown" class="absolute inset-y-0 right-0 px-2.5 flex items-center text-gray-400 hover:text-gray-600" aria-label="湯温リストを開く">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </button>
                             </div>
-                            <div id="temp-dropdown" class="combo-dropdown hidden absolute z-30 mt-1 w-full max-h-44 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg py-1 text-xs"></div>
+                            <div id="temp-dropdown" class="combo-dropdown hidden absolute z-30 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg py-1 text-xs sm:text-sm"></div>
                         </div>
 
                         <!-- 抽出時間 mm:ss（1ボックス：手入力＋リスト選択） -->
                         <div class="relative combo-box-wrapper">
-                            <label for="log-brew-time" class="block text-xs font-medium text-gray-600 mb-1 truncate">抽出時間 (mm:ss)</label>
+                            <label for="log-brew-time" class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5 truncate">抽出時間 (mm:ss)</label>
                             <div class="relative">
-                                <input type="text" id="log-brew-time" placeholder="2:30" inputmode="numeric" autocomplete="off" class="w-full rounded-md border-gray-300 shadow-sm pl-2.5 pr-7 py-1.5 border focus:ring-slate-500 focus:border-slate-500 text-sm font-semibold">
-                                <button type="button" tabindex="-1" data-combo-toggle="time-dropdown" class="absolute inset-y-0 right-0 px-2 flex items-center text-gray-400 hover:text-gray-600" aria-label="抽出時間リストを開く">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <input type="text" id="log-brew-time" placeholder="2:30" inputmode="numeric" autocomplete="off" class="w-full rounded-lg border-gray-300 shadow-sm pl-3.5 pr-8 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm sm:text-base font-semibold">
+                                <button type="button" tabindex="-1" data-combo-toggle="time-dropdown" class="absolute inset-y-0 right-0 px-2.5 flex items-center text-gray-400 hover:text-gray-600" aria-label="抽出時間リストを開く">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </button>
                             </div>
-                            <div id="time-dropdown" class="combo-dropdown hidden absolute z-30 mt-1 w-full max-h-44 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg py-1 text-xs"></div>
+                            <div id="time-dropdown" class="combo-dropdown hidden absolute z-30 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg py-1 text-xs sm:text-sm"></div>
                         </div>
                     </div>
 
-                    <!-- 行4：味わい評価（2列コンパクト配置で縦幅を圧縮） -->
-                    <div class="bg-slate-50/70 rounded-xl p-2.5 border border-gray-200/80">
-                        <div class="flex items-center justify-between mb-1.5 pb-1 border-b border-gray-200/70">
-                            <label class="block text-xs font-semibold text-gray-700">味わい評価 (1-5)</label>
-                            <div class="bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full text-[11px] font-bold text-amber-800">
-                                5項目合計: <span id="new-rating-sum" class="text-xs text-amber-900">15</span> / 25点
+                    <!-- 行4：味わい評価（2列ゆとり配置） -->
+                    <div class="bg-slate-50/80 rounded-xl p-3.5 sm:p-4 border border-gray-200/80">
+                        <div class="flex items-center justify-between mb-2.5 pb-1.5 border-b border-gray-200/70">
+                            <label class="block text-xs sm:text-sm font-semibold text-gray-700">味わい評価 (1-5)</label>
+                            <div class="bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs font-bold text-amber-800">
+                                5項目合計: <span id="new-rating-sum" class="text-sm text-amber-900">15</span> / 25点
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5" id="rating-inputs-container"></div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5" id="rating-inputs-container"></div>
                     </div>
 
-                    <!-- 行5：総合点 & メモ（1行集約） -->
-                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-stretch">
-                        <div class="sm:col-span-5 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200 flex items-center justify-between gap-2">
+                    <!-- 行5：総合点 & メモ -->
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 items-stretch">
+                        <div class="sm:col-span-5 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-200 flex items-center justify-between gap-2">
                             <div>
-                                <label for="log-overall-score" class="block text-xs font-bold text-slate-800">総合点</label>
-                                <span class="text-[10px] text-gray-500">100点満点</span>
+                                <label for="log-overall-score" class="block text-xs sm:text-sm font-bold text-slate-800">総合点</label>
+                                <span class="text-[11px] text-gray-500">100点満点</span>
                             </div>
-                            <div class="flex items-center gap-1">
-                                <input type="number" id="log-overall-score" min="0" max="100" step="1" placeholder="85" inputmode="numeric" class="w-16 text-right rounded-md border-gray-300 shadow-sm px-2 py-1 border focus:ring-slate-500 focus:border-slate-500 text-sm font-bold text-slate-900">
-                                <span class="text-xs font-medium text-gray-600">点</span>
+                            <div class="flex items-center gap-1.5">
+                                <input type="number" id="log-overall-score" min="0" max="100" step="1" placeholder="85" inputmode="numeric" class="w-20 text-right rounded-lg border-gray-300 shadow-sm px-2.5 py-1.5 border focus:ring-slate-500 focus:border-slate-500 text-base font-bold text-slate-900">
+                                <span class="text-xs sm:text-sm font-medium text-gray-600">点</span>
                             </div>
                         </div>
                         <div class="sm:col-span-7 flex flex-col justify-center">
-                            <label for="log-notes" class="block text-xs font-medium text-gray-600 mb-1">メモ (オプション)</label>
-                            <input type="text" id="log-notes" placeholder="気づきや豆の状態など" class="w-full rounded-md border-gray-300 shadow-sm px-3 py-1.5 border focus:ring-slate-500 focus:border-slate-500 text-sm">
+                            <label for="log-notes" class="block text-xs sm:text-sm font-medium text-gray-600 mb-1.5">メモ (オプション)</label>
+                            <input type="text" id="log-notes" placeholder="気づきや豆の状態など" class="w-full rounded-lg border-gray-300 shadow-sm px-3.5 py-2.5 border focus:ring-slate-500 focus:border-slate-500 text-sm">
                         </div>
                     </div>
 
                     <!-- 行6：保存ボタン -->
-                    <button type="submit" id="btn-submit" class="w-full bg-slate-900 text-white font-semibold py-2 rounded-lg shadow-md hover:bg-slate-800 active:scale-95 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                        クラウドに記録を保存する
-                    </button>
+                    <div class="pt-1">
+                        <button type="submit" id="btn-submit" class="w-full bg-slate-900 text-white font-semibold py-3 rounded-xl shadow-md hover:bg-slate-800 active:scale-[0.99] transition-all text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed">
+                            クラウドに記録を保存する
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -355,7 +359,7 @@
             </div>
         </div>
 
-        <!-- CSVバックアップ・インポート（検索カードの直下に控えめデザインで配置） -->
+        <!-- CSVバックアップ・インポート -->
         <div class="mb-4 bg-white/60 rounded-xl px-4 py-2 border border-gray-200/80">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
                 <div class="flex items-center gap-1.5 text-gray-500 font-medium text-xs">
@@ -391,7 +395,6 @@
 
         <!-- ログ一覧 -->
         <div class="glass-panel rounded-2xl shadow-sm p-4 sm:p-5 border border-gray-100 min-h-[400px]">
-            <!-- 一覧ヘッダー・表示切替コントロールバー -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b pb-3">
                 <div class="flex items-center gap-2 text-gray-600 font-semibold text-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
@@ -400,7 +403,6 @@
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2 text-xs">
-                    <!-- グリッド / リスト切替 -->
                     <div class="inline-flex rounded-lg border border-gray-300 bg-white p-0.5 shadow-sm" role="group">
                         <button type="button" id="btn-view-grid" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md font-medium bg-slate-800 text-white transition-colors" title="グリッド表示">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
@@ -412,7 +414,6 @@
                         </button>
                     </div>
 
-                    <!-- グリッド列数選択（1〜5列） -->
                     <div id="grid-cols-control" class="inline-flex items-center gap-1 bg-white border border-gray-300 rounded-lg px-2 py-1 shadow-sm">
                         <label for="select-grid-cols" class="text-gray-500 font-medium">横列:</label>
                         <select id="select-grid-cols" class="bg-transparent font-semibold text-slate-800 focus:outline-none cursor-pointer">
@@ -424,7 +425,6 @@
                         </select>
                     </div>
 
-                    <!-- 1ページ表示件数（10〜50件、10刻み、初期値10） -->
                     <div class="inline-flex items-center gap-1 bg-white border border-gray-300 rounded-lg px-2 py-1 shadow-sm">
                         <label for="select-page-size" class="text-gray-500 font-medium">表示:</label>
                         <select id="select-page-size" class="bg-transparent font-semibold text-slate-800 focus:outline-none cursor-pointer">
@@ -438,10 +438,8 @@
                 </div>
             </div>
 
-            <!-- ログ本体コンテナ -->
             <div id="logs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
-            <!-- ページネーションコントロール -->
             <div id="pagination-container" class="mt-6 pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-600">
                 <div id="pagination-info">0件中 0〜0件を表示</div>
                 <div id="pagination-buttons" class="flex items-center gap-1.5"></div>
@@ -451,7 +449,6 @@
 
     <!-- ==================== タブ3：統計ダッシュボード ==================== -->
     <section id="tab-content-stats" class="tab-hidden space-y-5">
-        <!-- 統計フィルタバー -->
         <div class="glass-panel rounded-2xl shadow-sm p-4 border border-gray-100">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-2 text-gray-700 font-semibold text-sm">
@@ -480,10 +477,8 @@
             </div>
         </div>
 
-        <!-- KPIサマリーカード -->
         <div id="stats-kpi-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"></div>
 
-        <!-- 中段：総合点推移グラフ & 5項目平均レーダーチャート -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
             <div class="lg:col-span-2 glass-panel rounded-2xl shadow-sm p-4 sm:p-5 border border-gray-100">
                 <div class="flex items-center justify-between mb-3 border-b pb-2">
@@ -503,7 +498,6 @@
             </div>
         </div>
 
-        <!-- 銘柄別ランキング・集計 -->
         <div class="glass-panel rounded-2xl shadow-sm p-4 sm:p-5 border border-gray-100">
             <div class="flex items-center justify-between mb-3 border-b pb-2">
                 <h3 class="text-sm font-bold text-gray-700">豆・銘柄別パフォーマンス</h3>
@@ -512,7 +506,6 @@
             <div id="stats-beans-table" class="overflow-x-auto"></div>
         </div>
 
-        <!-- 条件別分析グリッド -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div class="glass-panel rounded-2xl shadow-sm p-4 sm:p-5 border border-gray-100">
                 <h3 class="text-sm font-bold text-gray-700 mb-3 border-b pb-2">焙煎度合い別の傾向</h3>
@@ -609,7 +602,6 @@
     let filteredLogs = []; 
     let sortOrder = 'desc';
 
-    // 表示・ページネーション状態
     let viewMode = 'grid'; // 'grid' | 'list'
     let gridCols = 3;      // 1 ~ 5
     let pageSize = 10;     // 10 ~ 50 (初期値10)
@@ -745,7 +737,6 @@
             .replace(/'/g, '&#39;');
     }
 
-    // 秒数 -> "m:ss" 形式
     function formatBrewTime(sec) {
         if (sec === null || sec === undefined || sec === '' || isNaN(Number(sec))) return null;
         const total = Math.max(0, Math.round(Number(sec)));
@@ -754,7 +745,6 @@
         return `${m}:${s.toString().padStart(2, '0')}`;
     }
 
-    // "mm:ss" または数字文字列 ("230" -> 2:30, "90" -> 1:30) を秒数に変換
     function parseBrewTimeToSec(raw) {
         if (raw === null || raw === undefined) return null;
         const str = String(raw).trim();
@@ -793,7 +783,7 @@
 
     function renderDropdownItems(dropdownEl, inputEl, items, onSelectCallback = null) {
         dropdownEl.innerHTML = items.map(item => `
-            <button type="button" data-val="${escapeHtml(item.value)}" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 text-gray-700 font-medium flex items-center justify-between transition-colors">
+            <button type="button" data-val="${escapeHtml(item.value)}" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 text-gray-700 font-medium flex items-center justify-between transition-colors">
                 <span>${escapeHtml(item.label)}</span>
             </button>
         `).join('');
@@ -847,7 +837,6 @@
         }
     });
 
-    // 挽目・湯温・抽出時間の1ボックス初期化
     setupSingleBoxCombo(DOM.logGrind, DOM.grindDropdown, () => {
         if (beanFormMode === 'powder') {
             return POWDER_GRIND_OPTIONS.map(opt => ({ value: opt, label: opt }));
@@ -879,11 +868,11 @@
         }
     );
 
-    // 購入状態（豆 / 粉）切り替え（1ボックスの中身を切替）
+    // 購入状態（豆 / 粉）切り替え
     function updateBeanFormUI(mode) {
         beanFormMode = mode;
-        const active = "flex-1 px-3 py-1.5 text-xs font-medium border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors";
-        const inactive = "flex-1 px-3 py-1.5 text-xs font-medium border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors";
+        const active = "flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors";
+        const inactive = "flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors";
         
         if (mode === 'beans') {
             DOM.btnFormBeans.className = active + " rounded-l-lg";
@@ -1009,8 +998,8 @@
         if (!currentUser) return;
         activeTab = tabId;
 
-        const topActiveClass = "border-b-2 border-blue-400 text-blue-400 px-2.5 h-full flex items-center text-sm font-medium transition-colors whitespace-nowrap";
-        const topInactiveClass = "border-b-2 border-transparent text-slate-400 hover:text-slate-300 px-2.5 h-full flex items-center text-sm font-medium transition-colors whitespace-nowrap";
+        const topActiveClass = "border-b-2 border-blue-400 text-blue-400 px-3 h-full flex items-center text-sm font-medium transition-colors whitespace-nowrap";
+        const topInactiveClass = "border-b-2 border-transparent text-slate-400 hover:text-slate-300 px-3 h-full flex items-center text-sm font-medium transition-colors whitespace-nowrap";
         
         const bottomActiveClass = "flex-1 flex flex-col items-center justify-center py-2 text-blue-600 transition-colors";
         const bottomInactiveClass = "flex-1 flex flex-col items-center justify-center py-2 text-gray-400 hover:text-gray-600 transition-colors";
@@ -1099,17 +1088,17 @@
         }
 
         DOM.pourList.innerHTML = currentRecipe.pours.map(pour => `
-            <li class="flex justify-between items-center py-0.5 border-b border-gray-100 last:border-0">
-                <div><span class="inline-block w-4 text-gray-400 font-bold">${pour.id}</span><span class="text-gray-600">${pour.type}</span></div>
-                <div class="text-right"><span class="font-semibold text-slate-800">${pour.accum.toFixed(0)}ml</span><span class="text-[11px] text-gray-500 w-12 inline-block">(+${pour.amount.toFixed(0)}ml)</span></div>
+            <li class="flex justify-between items-center py-1 border-b border-gray-200/60 last:border-0">
+                <div><span class="inline-block w-5 text-gray-400 font-bold">${pour.id}</span><span class="text-gray-700">${pour.type}</span></div>
+                <div class="text-right"><span class="font-semibold text-slate-800">${pour.accum.toFixed(0)}ml</span><span class="text-xs text-gray-500 w-14 inline-block">(+${pour.amount.toFixed(0)}ml)</span></div>
             </li>
         `).join('');
     }
 
     function updateDrinkUI(mode) {
         drinkType = mode;
-        const active = "flex-1 px-2 py-1.5 text-xs font-medium border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors";
-        const inactive = "flex-1 px-2 py-1.5 text-xs font-medium border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors";
+        const active = "flex-1 px-3 py-2.5 text-xs sm:text-sm font-medium border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors";
+        const inactive = "flex-1 px-3 py-2.5 text-xs sm:text-sm font-medium border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors";
         DOM.btnDrinkBlack.className = inactive + " rounded-l-lg";
         DOM.btnDrinkLatte.className = inactive + " rounded-r-lg";
         if (mode === 'black') DOM.btnDrinkBlack.className = active + " rounded-l-lg";
@@ -1123,8 +1112,8 @@
     DOM.btnYield.addEventListener('click', () => { inputMode = 'yield'; updateCalcUI(DOM.btnYield, DOM.btnBeans, '総量 (ml)', 225); });
 
     function updateCalcUI(activeBtn, inactiveBtn, labelText, defaultVal) {
-        activeBtn.className = "flex-1 px-2 py-1.5 text-xs font-medium border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors " + (activeBtn === DOM.btnBeans ? "rounded-l-lg" : "rounded-r-lg");
-        inactiveBtn.className = "flex-1 px-2 py-1.5 text-xs font-medium border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors " + (inactiveBtn === DOM.btnBeans ? "rounded-l-lg" : "rounded-r-lg");
+        activeBtn.className = "flex-1 px-3 py-2.5 text-xs sm:text-sm font-medium border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors " + (activeBtn === DOM.btnBeans ? "rounded-l-lg" : "rounded-r-lg");
+        inactiveBtn.className = "flex-1 px-3 py-2.5 text-xs sm:text-sm font-medium border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors " + (inactiveBtn === DOM.btnBeans ? "rounded-l-lg" : "rounded-r-lg");
         DOM.inputLabel.textContent = labelText;
         DOM.baseAmount.value = defaultVal;
         calculateRecipe();
@@ -1132,8 +1121,8 @@
 
     function updateFlavorUI(mode) {
         flavorMode = mode;
-        const active = "flex-1 px-3 py-1.5 text-xs font-medium border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors";
-        const inactive = "flex-1 px-3 py-1.5 text-xs font-medium border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors";
+        const active = "flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium border bg-slate-800 text-white border-slate-800 focus:outline-none transition-colors";
+        const inactive = "flex-1 px-4 py-2.5 text-xs sm:text-sm font-medium border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 focus:outline-none transition-colors";
         DOM.btnFlavorSweet.className = inactive + " rounded-l-lg";
         DOM.btnFlavorNormal.className = inactive;
         DOM.btnFlavorAcidic.className = inactive + " rounded-r-lg";
@@ -1165,19 +1154,21 @@
     }
 
     function generateRatingUI(prefix, defaultValues = {}, compact = false) {
-        const btnSize = compact ? 'w-6 h-6 text-xs' : 'w-7 h-7 text-xs';
+        const btnSize = compact ? 'w-6 h-6 text-xs' : 'w-7 h-7 sm:w-8 sm:h-8 text-xs sm:text-sm';
+        const labelClass = compact ? 'text-xs font-medium text-gray-600 w-11' : 'text-xs sm:text-sm font-medium text-gray-700 w-14';
+        const gapClass = compact ? 'gap-1' : 'gap-1.5';
         return RATING_KEYS.map(item => {
             const val = defaultValues[item.id] || 3; 
             const buttons = [1, 2, 3, 4, 5].map(num => `
                 <label class="cursor-pointer">
                     <input type="radio" name="${prefix}_${item.id}" value="${num}" class="peer sr-only" ${num === val ? 'checked' : ''}>
-                    <div class="${btnSize} rounded-full flex items-center justify-center border bg-white peer-checked:bg-yellow-400 peer-checked:text-white peer-checked:border-yellow-400 text-gray-500 hover:bg-gray-100 transition-colors font-medium">${num}</div>
+                    <div class="${btnSize} rounded-full flex items-center justify-center border bg-white peer-checked:bg-yellow-400 peer-checked:text-white peer-checked:border-yellow-400 text-gray-500 hover:bg-gray-100 transition-colors font-semibold">${num}</div>
                 </label>
             `).join('');
-            return `<div class="flex items-center justify-between"><span class="text-xs font-medium text-gray-600 w-11">${item.label}</span><div class="flex gap-1">${buttons}</div></div>`;
+            return `<div class="flex items-center justify-between"><span class="${labelClass}">${item.label}</span><div class="flex ${gapClass}">${buttons}</div></div>`;
         }).join('');
     }
-    DOM.ratingContainer.innerHTML = generateRatingUI('new', {}, true);
+    DOM.ratingContainer.innerHTML = generateRatingUI('new', {}, false);
     DOM.ratingContainer.addEventListener('change', updateNewRatingSumDisplay);
     updateNewRatingSumDisplay();
 
@@ -1410,7 +1401,7 @@
             DOM.logBrewTime.value = '';
             DOM.logRoast.value = '';
 
-            DOM.ratingContainer.innerHTML = generateRatingUI('new', {}, true);
+            DOM.ratingContainer.innerHTML = generateRatingUI('new', {}, false);
             updateNewRatingSumDisplay();
             updateFlavorUI('normal');
             updateDrinkUI('black');
@@ -1581,7 +1572,6 @@
                             </select>
                         </div>
                     </div>
-                    <!-- 挽目・湯温・抽出時間（1ブロック3列・各1ボックス） -->
                     <div class="grid grid-cols-3 gap-1.5">
                         <div>
                             <label class="block text-[10px] text-gray-500 mb-1">挽目</label>
